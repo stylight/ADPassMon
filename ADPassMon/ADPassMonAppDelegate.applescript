@@ -55,6 +55,33 @@ script ADPassMonAppDelegate
     property warningDays : missing value
     property thePassword : missing value
     property toggleNotifyButton : missing value
+    property passwordPromptWindow : missing value
+    property passwordPromptWindowText : missing value
+    property passwordPromptWindowTitle : missing value
+    property passwordPromptWindowButton1 : missing value
+    property changePasswordPromptWindowTitle : "Change Password"
+    property changePasswordPromptWindowButton1 : "Change"
+    property changePasswordPromptWindowText : "Please fill out all fields below.
+
+You need to be connected to your company's or institute's network to update your password, & to comply with any password policy set.
+
+Your login keychain will also be updated."
+    property oldPassword : missing value
+    property newPassword : missing value
+    property verifyPassword : missing value
+    property enteredOldPassword : missing value
+    property enteredNewPassword : missing value
+    property enteredVerifyPassword : missing value
+    property checkKeychainLock : false
+    property keychainState : missing value
+    property isBehaviour2Enabled : missing value
+    property unlockKeychainPasswordWindowTitle : "Your Keychain is Locked!"
+    property unlockKeychainPasswordWindowButton1 : "Update"
+    property unlockKeychainPasswordWindowText : "If you know the last password you used to login to the Mac, please fill out all the fields below & then click Update.
+
+If you do not know the Keychain password, enter your new password in the new & verify fields. Then click 'Create New Keychain'"
+    property pwPolicyTest : missing value
+    property pwPolicyString : missing value
 
 --- Booleans
     property isIdle : true
@@ -67,9 +94,17 @@ script ADPassMonAppDelegate
     property skipKerb : false
     property showChangePass : false
     property KerbMinderInstalled : false
-    
+    property enablePasswordPromptWindowButton2 : false
+    property firstPasswordCheckPassed : true
+    property userPasswordChanged : false
+    property pwPolicyUpdateExternal : false
+    property allowPasswordChange : true
+    property keychainCreateNew : false
+    property enablePasswordPolicy : false
+    property keychainPolicyEnabled : false
+    property passwordCheckPassed : false
+   
 --- Other Properties
-
     property mavAccTest : 1
     property tooltip : "Waiting for data…"
     property osVersion : ""
@@ -91,6 +126,14 @@ script ADPassMonAppDelegate
     property daysUntilExpNice : ""
     property expirationDate : ""
     property mavAccStatus : ""
+    property selectedBehaviour : 1
+    property keychainPolicy : ""
+    property pwPolicyURLButtonTitle : ""
+    property pwPolicyURLButtonURL : ""
+    property pwPolicyURLButtonBrowser : ""
+    property passwordCheckInterval : 12
+    property keychainPolicyText : ""
+    property enableKeychainLockCheck : ""
 
 --- HANDLERS ---
     
@@ -107,46 +150,64 @@ script ADPassMonAppDelegate
         log "Running on OS 10." & osVersion & ".x"
     end getOS_
     
+    -- Check & log the selected Behaviour
+    on doSelectedBehaviourCheck_(sender)
+        if selectedBehaviour is 1 then
+            useBehaviour1_(me)
+            acctest_(me)
+        else
+            useBehaviour2_(me)
+            set my passwordPromptWindowTitle to changePasswordPromptWindowTitle
+            set my passwordPromptWindowButton1 to changePasswordPromptWindowButton1
+            set my passwordPromptWindowText to changePasswordPromptWindowText
+        end if
+    end doSelectedBehaviourCheck_
+
     -- Tests if Universal Access scripting service is enabled
     on accTest_(sender)
-        log "Testing Universal Access settings…"
-        if osVersion is less than 9 then
-            tell application "System Events"
-                set accStatus to get UI elements enabled
-            end tell
-            if accStatus is true then
-                log "  Enabled"
-            else
-                log "  Disabled"
-                accEnable_(me)
-            end if
-        else -- if we're running 10.9 or later, Accessibility is handled differently
-            tell defaults to set my mavAccTest to objectForKey_("mavAccTest")
-            if mavAccTest is 1 then
-                if "80" is in (do shell script "/usr/bin/id -G") then -- checks if user is in admin group
-                    set accessDialog to (display dialog "ADPassMon's \"Change Password\" feature requires assistive access to open the password panel.
-                    
-Enable it now? (requires password)" with icon 2 buttons {"No", "Yes"} default button 2)
-                    if button returned of accessDialog is "Yes" then
-                        log "  Prompting for password"
-                        try
-                            set mavAccStatus to (do shell script "sqlite3 '/Library/Application Support/com.apple.TCC/TCC.db' \"SELECT * FROM access WHERE client='org.pmbuko.ADPassMon';\"" with administrator privileges)
-                        end try
-                        if mavAccStatus is "" then
-                            log "  Not enabled"
+        -- Skip if Behaviour 2 is selected
+        if selectedBehaviour is 1 then
+            log "Testing Universal Access settings…"
+            if osVersion is less than 9 then
+                tell application "System Events"
+                    set accStatus to get UI elements enabled
+                end tell
+                if accStatus is true then
+                    log "  Enabled"
+                else
+                    log "  Disabled"
+                    accEnable_(me)
+                end if
+            else -- if we're running 10.9 or later, Accessibility is handled differently
+                tell defaults to set my mavAccTest to objectForKey_("mavAccTest")
+                if mavAccTest is 1 then
+                    if "80" is in (do shell script "/usr/bin/id -G") then -- checks if user is in admin group
+                        set accessDialog to (display dialog "ADPassMon's \"Change Password\" feature requires assistive access to open the password panel.
+                        
+    Enable it now? (requires password)" with icon 2 buttons {"No", "Yes"} default button 2)
+                        if button returned of accessDialog is "Yes" then
+                            log "  Prompting for password"
                             try
-                                do shell script "sqlite3 '/Library/Application Support/com.apple.TCC/TCC.db' \"INSERT INTO access VALUES('kTCCServiceAccessibility','org.pmbuko.ADPassMon',0,1,1,NULL);\"" with administrator privileges
-                                set my mavAccTest to 0
-                                tell defaults to setObject_forKey_(0, "mavAccTest")
-                            on error theError
-                                log "Unable to set access. Error: " & theError
+                                set mavAccStatus to (do shell script "sqlite3 '/Library/Application Support/com.apple.TCC/TCC.db' \"SELECT * FROM access WHERE client='org.pmbuko.ADPassMon';\"" with administrator privileges)
                             end try
-                        else
-                            log "  Enabled"
+                            if mavAccStatus is "" then
+                                log "  Not enabled"
+                                try
+                                    do shell script "sqlite3 '/Library/Application Support/com.apple.TCC/TCC.db' \"INSERT INTO access VALUES('kTCCServiceAccessibility','org.pmbuko.ADPassMon',0,1,1,NULL);\"" with administrator privileges
+                                    set my mavAccTest to 0
+                                    tell defaults to setObject_forKey_(0, "mavAccTest")
+                                on error theError
+                                    log "Unable to set access. Error: " & theError
+                                end try
+                            else
+                                log "  Enabled"
+                            end if
                         end if
                     end if
                 end if
             end if
+        else
+            log "Skipping Universal Access Settings Testing..."
         end if
     end accTest_
 
@@ -188,6 +249,29 @@ Enable it now?" with icon 2 buttons {"No", "Yes"} default button 2)
             end if
         end tell
     end KerbMinderTest_
+    
+    -- Check if Checking keychain lock is enabled
+    on doKeychainLockCheck_(sender)
+        tell defaults to set my enableKeychainLockCheck to objectForKey_("enableKeychainLockCheck") as integer
+        if my enableKeychainLockCheck is 1 then
+            log "  Testing Keychain Lock state..."
+            -- check for login keycchain path
+            try
+                do shell script "security unlock-keychain -p ~/Library/Keychains/login.keychain"
+                set keychainState to "unlocked"
+                log "  Keychain unlocked..."
+            on error
+                set keychainState to "locked"
+            end try
+            -- If keychain is locked, the prompt user...
+            if keychainState is "locked" then
+                log "  Keychain locked..."
+                closeKeychainAccess_(me)
+            end if
+        else
+            log "  Skipping Keychain Lock state check..."
+        end if
+    end doKeychainLockCheck_
 
     -- Register plist default settings
     on regDefaults_(sender)
@@ -205,7 +289,17 @@ Enable it now?" with icon 2 buttons {"No", "Yes"} default button 2)
                                             pwPolicyButton:pwPolicyButton, ¬
                                             mavAccTest:mavAccTest, ¬
                                             enableKerbMinder:enableKerbMinder, ¬
-                                            launchAtLogin:launchAtLogin})
+                                            keychainPolicy:keychainPolicy, ¬
+                                            launchAtLogin:launchAtLogin, ¬
+                                            enableKeychainLockCheck:0, ¬
+                                            selectedBehaviour:1, ¬
+                                            isBehaviour2Enabled:0, ¬
+                                            changePasswordPromptWindowTitle:changePasswordPromptWindowTitle, ¬
+                                            pwPolicyURLButtonTitle:pwPolicyURLButtonTitle, ¬
+                                            pwPolicyURLButtonURL:pwPolicyURLButtonURL, ¬
+                                            pwPolicyURLButtonBrowser:pwPolicyURLButtonBrowser, ¬
+                                            passwordCheckInterval:passwordCheckInterval, ¬
+                                            allowPasswordChange:allowPasswordChange })
     end regDefaults_
     
     -- Get values from plist
@@ -222,6 +316,15 @@ Enable it now?" with icon 2 buttons {"No", "Yes"} default button 2)
         tell defaults to set my mavAccTest to objectForKey_("mavAccTest")
         tell defaults to set my enableKerbMinder to objectForKey_("enableKerbMinder")
         tell defaults to set my launchAtLogin to objectForKey_("launchAtLogin")
+        tell defaults to set my enableKeychainLockCheck to objectForKey_("enableKeychainLockCheck") as integer
+        tell defaults to set my selectedBehaviour to objectForKey_ ("selectedBehaviour") as integer
+        tell defaults to set my isBehaviour2Enabled to objectForKey_("isBehaviour2Enabled") as integer
+        tell defaults to set my changePasswordPromptWindowTitle to objectForKey_("changePasswordPromptWindowTitle")
+        tell defaults to set my pwPolicyURLButtonTitle to objectForKey_("pwPolicyURLButtonTitle")
+        tell defaults to set my pwPolicyURLButtonURL to objectForKey_("pwPolicyURLButtonURL")
+        tell defaults to set my pwPolicyURLButtonBrowser to objectForKey_("pwPolicyURLButtonBrowser") as string
+        tell defaults to set my allowPasswordChange to objectForKey_("allowPasswordChange")
+        tell defaults to set my passwordCheckInterval to objectForKey_ ("passwordCheckInterval") as integer
 	end retrieveDefaults_
 
     on notifySetup_(sender)
@@ -516,6 +619,10 @@ Enable it now?" with icon 2 buttons {"No", "Yes"} default button 2)
         on error theError
             errorOut_(theError, 1)
         end try
+        -- Check for Selected Behaviour
+        doSelectedBehaviourCheck_(me)
+        -- Check for Keychain Lock
+        doKeychainLockCheck_(me)
 	end doProcess_
 
 --- INTERFACE BINDING HANDLERS ---
@@ -525,44 +632,419 @@ Enable it now?" with icon 2 buttons {"No", "Yes"} default button 2)
         activate
         current application's NSApp's orderFrontStandardAboutPanel_(null)
     end about_
-
+    
     -- Bound to Change Password menu item
     on changePassword_(sender)
-        tell defaults to set my pwPolicy to objectForKey_("pwPolicy") as string
-        tell defaults to set my pwPolicyButton to objectForKey_("pwPolicyButton") as string
-        if my pwPolicy is not "" then
+        -- Open System Preferences if Behaviour 1 is set
+        if selectedBehaviour is 1 then
+            tell defaults to set my pwPolicy to objectForKey_("pwPolicy") as string
+            if my pwPolicy is not "" then
+                pwPolicyDisplay_(me)
+            end if
+            tell application "System Preferences"
+                try -- to use UI scripting
+                    set current pane to pane id "com.apple.preferences.users"
+                    activate
+                    tell application "System Events"
+                        tell application process "System Preferences"
+                            if my osVersion is less than or equal to 6 then
+                                click radio button "Password" of tab group 1 of window "Accounts"
+                                click button "Change Password…" of tab group 1 of window "Accounts"
+                            end if
+                            if my osVersion is greater than 6 then
+                                click radio button "Password" of tab group 1 of window "Users & Groups"
+                                click button "Change Password…" of tab group 1 of window "Users & Groups"
+                            end if
+                        end tell
+                    end tell
+                    on error theError
+                    errorOut_(theError, 1)
+                end try
+            end tell
+        else
+            -- If Behaviour 2 is enabled, then use the different password change mechanism
+            -- Close the Prefs window if open
+            closeMainWindow_(me)
+            -- Check for pwpolicy, & if set.. prompt
+            tell defaults to set pwPolicy to objectForKey_("pwPolicy") as string
+            if pwPolicy is not "" then
+                pwPolicyDisplay_(me)
+            end if
+            -- If user did not chose to update externally or was not prompted, then continue
+            if pwPolicyUpdateExternal is false
+                -- Set passwordPromptWindows settings
+                set my enablePasswordPromptWindowButton2 to false
+                set my passwordPromptWindowText to changePasswordPromptWindowText
+                showPasswordPromptWindow_(me)
+            end if
+        end if
+    end changePassword_
+
+    -- Check to see if Keychain Access is open, as can cause some issues. Prompt use to close
+    on closeKeychainAccess_(sender)
+        -- Close the Prefs window if open
+        closeMainWindow_(me)
+        tell application "System Events"
+            set ProcessList to name of every process
+            if "Keychain Access" is in ProcessList then
+                display dialog "Keychain Access needs to be closed to proceed" with icon 2 buttons {"Cancel", "Close Keychain Access"} default button "Close Keychain Access"
+                if button returned of the result is "Close Keychain Access" then
+                    set ThePID to unix id of process "Keychain Access"
+                    do shell script "kill -KILL " & ThePID
+                end if
+            end if
+        end tell
+        -- Run the update keychain handler
+        keychainPasswordPrompt_(me)
+    end closeKeychainAccess_
+
+    -- Launch the password prompt window to change Keychain Password
+    on keychainPasswordPrompt_(sender)
+        -- Show keychain policy if set
+        tell defaults to set my keychainPolicy to objectForKey_("keychainPolicy") as string
+        if my keychainPolicy is not "" then
             tell application "System Events"
-                display dialog pwPolicy with icon 2 buttons {pwPolicyButton}
+                display dialog keychainPolicy with icon 2 buttons {"OK"}
             end tell
         end if
-        tell application "System Preferences"
-            try -- to use UI scripting
-                set current pane to pane id "com.apple.preferences.users"
-                activate
+        -- If the password prompt window is not set to change, then display Keychain unlock details.
+        set my passwordPromptWindowTitle to unlockKeychainPasswordWindowTitle
+        set my passwordPromptWindowButton1 to unlockKeychainPasswordWindowButton1
+        set my passwordPromptWindowText to unlockKeychainPasswordWindowText
+        set my enablePasswordPromptWindowButton2 to true
+        -- Close the Prefs window if open
+        closeMainWindow_(me)
+        -- Show the password prompt window
+        showPasswordPromptWindow_(me)
+    end keychainPasswordPrompt_
+
+    -- Check entered passwords
+    on enteredPasswordCheck_(sender)
+        -- Get the value of entered passwords
+        set the enteredOldPassword to (oldPassword's stringValue()) as string
+        set the enteredNewPassword to (newPassword's stringValue()) as string
+        set the enteredVerifyPassword to (verifyPassword's stringValue()) as string
+        -- Check that all password fields are filled out if changing password & not at keychain prompt
+        if my passwordPromptWindowButton1 is equal to "Change"
+            if enteredOldPassword is equal to "" or enteredNewPassword is equal to "" or enteredVerifyPassword is equal to "" then
                 tell application "System Events"
-                    tell application process "System Preferences"
-                        if my osVersion is less than or equal to 6 then
-                            click radio button "Password" of tab group 1 of window "Accounts"
-                            click button "Change Password…" of tab group 1 of window "Accounts"
-                        end if
-                        if my osVersion is greater than 6 then
-                            click radio button "Password" of tab group 1 of window "Users & Groups"
-                            click button "Change Password…" of tab group 1 of window "Users & Groups"
-                        end if
-                    end tell
+                    display dialog "Please fill out all password fields." with icon 2 buttons {"OK"} default button "OK"
                 end tell
-            on error theError
-                errorOut_(theError, 1)
+                changePassword_(me)
+                set firstPasswordCheckPassed to false
+            end if
+        else
+            if enteredNewPassword is equal to "" or enteredVerifyPassword is equal to "" then
+                tell application "System Events"
+                    display dialog "Please fill out both the New & Verify password fields" with icon 2 buttons {"OK"} default button "OK"
+                end tell
+                keychainPasswordPrompt_(me)
+                set firstPasswordCheckPassed to false
+            end if
+        end if
+        -- If the above check have been passed, verify that the new & verify passwords are the same
+        if firstPasswordCheckPassed is equal to true
+            -- Check that the new & verify passwords are the same, prompt if not. Then return to password prompt window.
+            if my enteredNewPassword does not equal enteredVerifyPassword
+                tell application "System Events"
+                    display dialog "Your New & Verified passwords did not match. Please try again." with icon 2 buttons {"OK"} default button "OK"
+                end tell
+                -- If fails, go back to handler that called this handler
+                if my passwordPromptWindowButton1 is equal to "Change"
+                    changePassword_(me)
+                else
+                    keychainPasswordPrompt_(me)
+                end if
+
+            else
+                -- set to boolean of value
+                set my keychainCreateNew to keychainCreateNew as boolean
+                -- If we're creating a new keychain
+                if keychainCreateNew is true
+                    log "All password fields populated & new & verify match, proceeding with new keychain creation..."
+                    createNewKeychain_(me)
+                else
+                    log "All password fields populated & new & verify match..."
+                    attemptChangePassword_(me)
+                end if
+            end if
+        end if
+    end enteredPasswordCheck_
+
+    -- Attempt change password -  the meat of v2 behaviour
+    on attemptChangePassword_(sender)
+        -- If changing password, change keychain pass too.
+        if passwordPromptWindowButton1 is equal to "Change"
+            updatePassword_(me)
+            updateKeychainPassword_(me)
+        else
+            set userPasswordChanged to true
+            updateKeychainPassword_(me)
+    end if
+    end attemptChangePassword_
+
+    -- Try & reset the users password via dscl
+    on updatePassword_(sender)
+        try
+            --log "Attempting user password change.."
+            do shell script "dscl . -passwd /Users/$USER " & quoted form of enteredOldPassword & " " & quoted form of enteredNewPassword
+            log "Password changed!"
+            set userPasswordChanged to true
+            
+            -- Set Keychain settings to make sure they are unlocked
+            setKeychainSettings_(me)
+            
+            on error errStr
+            -- Errors if not connected to company/institutes network
+            if errStr contains "eDSServiceUnavailable" then
+                log "Password change failed. Please verify that you are connected to your companies/institutes network & try again"
+                display dialog "Password change failed. Please verify that you are connected to your company's/institute's network & try again" with icon 2 buttons {"OK"} default button "OK"
+                if button returned of the result is "OK" then
+                    changePassword_(me)
+                end if
+                -- Errors if password change fails due to old pass being wrong or new pass not meeting password policy requirements
+                else if errStr contains "eDSAuthMethodNotSupported" then
+                    log "Password change failed. Please verify that you have entered the correct password in the Old Password field & that your New Password meets your company's/institute's password policy"
+                    display dialog "Password change failed. Please verify that you have entered the correct password in the Old Password field & that your New Password meets your company's/institute's password policy" with icon 2 buttons {"OK"} default button "OK"
+                if button returned of the result is "OK" then
+                    changePassword_(me)
+                end if
+                -- Oops, not sure what happened.. :(
+            else
+                    log "Password change failed. Please try again."
+                    display dialog "Password change failed. Please try again." with icon 2 buttons {"OK"} default button "OK"
+                    if button returned of the result is "OK" then
+                        changePassword_(me)
+                    end if
+            end if
+        end try
+    end updatePassword_
+
+    -- Try & update the users keychain password
+    on updateKeychainPassword_(sender)
+        -- If we've changed password
+        if userPasswordChanged is equal to true
+            try
+                -- Log Action
+                log "Attempting Keychain unlock.."
+                -- Unlock the keychain
+                do shell script "security unlock-keychain -p " & quoted form of enteredOldPassword & " ~/Library/Keychains/login.keychain"
+                -- Make sure that the Keychains password is set to what the new password
+                log "Attempting keychain password update.."
+                -- Set keychain password
+                do shell script "security set-keychain-password -o " & quoted form of enteredOldPassword & " -p " & quoted form of enteredNewPassword & " ~/Library/Keychains/login.keychain"
+                -- Log Action
+                log "Keychain successfully updated!"
+                -- Close the password prompt window
+                closePasswordPromptWindow_(me)
+                -- Advise the user that it's worked
+                display dialog "Update successful!" with icon 1 buttons ("OK") default button {"OK"}
+                -- Set to front window
+                tell application "System Events" to set frontmost of process "ADPassMon" to true
+            on error
+                -- Log Action
+                log "Keychain update failed!"
+                -- Display dialog to user
+                display dialog "Keychain update failed. Please try again" with icon 2 buttons {"OK"} default button "OK"
+                -- If OK button is clicked
+                if button returned of the result is "OK" then
+                    -- Try & update the users keychain password
+                    keychainPasswordPrompt_(me)
+                end if
             end try
+        end if
+    end updateKeychainPassword_
+
+    on createNewKeychainButton_(sender)
+        -- If create new keychain button was pressed,
+        set my keychainCreateNew to true
+        -- Check entered passwords
+        enteredPasswordCheck_(me)
+    end createNewKeychainButton_
+
+    -- Create a new keychain
+    on createNewKeychain_(sender)
+        try
+            -- Log option choosen
+            log "User selected create new keychain..."
+            -- If running 10.9.+, then delete the local items keychain too
+            if osVersion is greater than 8 then
+                -- Get the Macs UUID
+                set macUUID to do shell script "system_profiler SPHardwareDataType | awk '/Hardware UUID:/{ print $NF}'"
+                log "Retreived this Macs UUID..."
+                -- Try to delete the local items Keychain db's
+                try
+                    do shell script "rm -rf ~/Library/Keychains/" & macUUID & "/*"
+                    log "Deleted local items keychain..."
+                end try
+                -- Delete the login Keychain
+                try
+                    do shell script "security delete-keychain ~/Library/Keychains/login.keychain"
+                    log "Deleted old login.keychain..."
+                on error -- If cannot find the login keychain, then prompt to create a new one.
+                    log "Couldn't find old Login Keychain..."
+                    cannotFindKeychain_(me)
+                end try
+                -- Close the password prompt window
+                closePasswordPromptWindow_(me)
+                -- 10.9.x needs the mac client to restart as securityd or another daemon process owned by the system is used to update the local items keychain
+                log "Prompting to restart"
+                display dialog "Your Mac needs to restart to finish updating your Keychain. Please dismiss any Local Items keychain prompts, close any open Applications & click Restart Now." with icon 0 buttons ("Restart Now")
+                -- set to false
+                set my keychainCreateNew to false
+                -- Restart the Mac
+                log "Restarting..."
+                tell application "System Events"
+                    restart
+                end tell
+                
+            else
+                -- Delete the login Keychain
+                try
+                    do shell script "security delete-keychain ~/Library/Keychains/login.keychain"
+                    log "Deleted old keychain..."
+                on error -- If cannot find the login keychain, then prompt to create a new one.
+                    log "Couldn't find old Login Keychain..."
+                    cannotFindKeychain_(me)
+                end try
+                -- Create a new login Keychain with the new password enrtered
+                do shell script "security create-keychain -p " & quoted form of enteredNewPassword & " ~/Library/Keychains/login.keychain"
+                log "New keychain created!"
+                -- set to false
+                set my keychainCreateNew to false
+                -- Set Keychain settings to make sure they are unlocked
+                setKeychainSettings_(me)
+                -- Close the password prompt window
+                closePasswordPromptWindow_(me)
+            end if
+        on error
+            log "Creating a new keychain failed..."
+            display dialog "New Keychain creation failed. Please try again" with icon 2 buttons {"OK"} default button "OK"
+            if button returned of the result is "OK" then
+                keychainPasswordPrompt_(me)
+            end if
+        end try
+    end createNewKeychain_
+
+    -- Set Keychain settings to make sure they are unlocked
+    on setKeychainSettings_(sender)
+        -- Log Action
+        log "Setting keychain settings"
+        try
+            -- Make sure keychain is not set to lock on sleep
+            do shell script "security set-keychain-settings -l ~/Library/Keychains/login.keychain"
+            -- Log Action
+            log "Set to not lock at sleep"
+            -- Make sure keychain is not set to lock after x minutes
+            do shell script "security set-keychain-settings -u ~/Library/Keychains/login.keychain"
+            -- Log Action
+            log "Set to not lock at after time"
+            --recheck expiration
+            doProcess_(me)
+        on error
+            -- Log Action
+            log "Error setting login.keychain settings..."
+        end try
+    end setKeychainSettings_
+
+    -- If cannot find Keychain
+    on cannotFindKeychain_(sender)
+        -- Prompt user
+        display dialog "No login keychain found. Please restart to create a new keychain." with icon 0 buttons ("Restart Now")
+        try
+            -- If running 10.9.+, then delete the local items keychain too
+            if osVersion is greater than 8 then
+                -- Get the Macs UUID
+                set macUUID to do shell script "system_profiler SPHardwareDataType | awk '/Hardware UUID:/{ print $NF}'"
+                -- Log Action
+                log "Retrieved this Macs UUID..."
+                try
+                    -- Delete the local items Keychain db's if exists
+                    do shell script "rm -rf ~/Library/Keychains/" & macUUID & "/*"
+                    -- Log Action
+                    log "Deleted local items keychain..."
+                end try
+            end if
+        end try
+        -- Log Action
+        log "Restarting..."
+        -- Restart the Mac
+        tell application "System Events"
+            restart
         end tell
-    end changePassword_
-    
+    end cannotFindKeychain_
+
+    -- pwPolicy advanced display settings
+    on pwPolicyDisplay_(sender)
+        -- Retreive pwPolicyURL's variables values, quoted to resolve issues with spaces
+        tell defaults to set my pwPolicyURLButtonTitle to objectForKey_("pwPolicyURLButtonTitle") as string
+        tell defaults to set my pwPolicyURLButtonURL to objectForKey_("pwPolicyURLButtonURL") as string
+        tell defaults to set my pwPolicyURLButtonBrowser to objectForKey_("pwPolicyURLButtonBrowser") as string
+        -- If either pwPolicyURLButtonTitle or pwPolicyURLButtonURL is not set, then display standard pwPolicy prompt
+        if pwPolicyURLButtonTitle is "" or pwPolicyURLButtonURL is "" then
+            -- Display password policy dialog
+            tell application "System Events"
+                display dialog pwPolicy with icon 2 buttons {"OK"}
+            end tell
+            -- If both pwPolicyURLButtonTitle or pwPolicyURLButtonURL are set, then display second button
+        else if pwPolicyURLButtonTitle is not equal to "" and pwPolicyURLButtonURL is not equal to "" then
+            -- Display password policy dialog
+            tell application "System Events"
+                display dialog pwPolicy with icon 2 buttons {"OK", pwPolicyURLButtonTitle}
+            end tell
+            -- If pwPolicyURLButtonTitle...
+            if button returned of the result is pwPolicyURLButtonTitle then
+                -- If pwPolicyURLButton is not set, then open pwPolicyURLButtonURL in the default browser
+                if pwPolicyURLButtonBrowser is equal to "" then
+                    -- Open URL in the default browser
+                    open location pwPolicyURLButtonURL
+                    -- If users chose the URL, then we don't want to proceed
+                    set pwPolicyUpdateExternal to true
+                    -- If pwPolicyURLBrowser is set, then open pwPolicyURLButtonURL in the selected browser
+                    else
+                    -- Open URL in the selected browser
+                    tell application pwPolicyURLButtonBrowser to open location pwPolicyURLButtonURL
+                    -- Bring selected browser to front
+                    tell application pwPolicyURLButtonBrowser
+                        activate
+                    end tell
+                    -- If users chose the URL, then we don't want to proceed
+                    set pwPolicyUpdateExternal to true
+                end if
+            else
+                -- Set variable to boolean
+                set allowPasswordChange to allowPasswordChange as boolean
+                -- If password change is  not allowed, then proceed
+                if allowPasswordChange is false then
+                    -- If password change is disabled, then don't proceed.
+                    set pwPolicyUpdateExternal to true
+                end if
+            end if
+        end if
+    end pwPolicyDisplay_
+
     -- Bound to Prefs menu item
 	on showMainWindow_(sender)
 		activate
 		theWindow's makeKeyAndOrderFront_(null)
 	end showMainWindow_
-    
+
+    -- Bound to Prefs menu item
+    on showPasswordPromptWindow_(sender)
+        activate
+        passwordPromptWindow's makeKeyAndOrderFront_(null)
+    end showPasswordPromptWindow_
+
+    -- Close the Prefs Menu
+    on closeMainWindow_(sender)
+        theWindow's orderOut_(null)
+    end closeMainWindow_
+
+    -- Close the password prompt window
+    on closePasswordPromptWindow_(sender)
+        passwordPromptWindow's orderOut_(null)
+    end closePasswordPromptWindow_
+
     -- Bound to Quit menu item
     on quit_(sender)
 		quit
@@ -591,6 +1073,28 @@ Enable it now?" with icon 2 buttons {"No", "Yes"} default button 2)
             doKerbCheck_(me)
         end if
     end useManualMethod_
+
+    -- Bound to Version 1 radio button on the Prefs window
+    on useBehaviour1_(sender)
+        set selectedBehaviour to 1
+        set my isBehaviour2Enabled to 0
+        tell defaults to setObject:1 forKey:"selectedBehaviour"
+        tell defaults to setObject:0 forKey:"isBehaviour2Enabled"
+        -- Disable Keychain Policy options
+        set my keychainPolicyEnabled to false
+        log "Behaviour 1 enabled..."
+    end useBehaviour1_
+
+    -- Bound to Version 2 radio button on the Prefs window
+    on useBehaviour2_(sender)
+        set selectedBehaviour to 2
+        set my isBehaviour2Enabled to 1
+        tell defaults to setObject:2 forKey:"selectedBehaviour"
+        tell defaults to setObject:1 forKey:"isBehaviour2Enabled"
+        -- Enable Keychain Policy options
+        set my keychainPolicyEnabled to true
+        log "Behaviour 2 enabled..."
+    end useBehaviour2_
 
     -- Bound to warningDays box in Prefs window
     on setWarningDays_(sender)
@@ -623,6 +1127,43 @@ Enable it now?" with icon 2 buttons {"No", "Yes"} default button 2)
         end if
     end toggleKerbMinder_
 
+    -- Bound to Check Keychain items in menu and Prefs window
+    on toggleKeychainLockCheck_(sender)
+        if my enableKeychainLockCheck is 1 then
+            set my enableKeychainLockCheck to 0
+            tell defaults to setObject_forKey_(0, "enableKeychainLockCheck")
+            log " Keychain Lock Check disabled..."
+        else
+            set my enableKeychainLockCheck to 1
+            tell defaults to setObject_forKey_(1, "enableKeychainLockCheck")
+            log " Keychain Lock Check enabled..."
+        end if
+    end toggleKeychainLockCheck_
+
+    -- Bound to Allow Password Change item in Prefs window
+    on toggleAllowPasswordChange_(sender)
+        -- set to boolean of value
+        set allowPasswordChange to allowPasswordChange as boolean
+        if allowPasswordChange is true then
+            set allowPasswordChange to false
+            tell defaults to setObject_forKey_(allowPasswordChange, "allowPasswordChange")
+            log " Password change disabled..."
+        else
+            set allowPasswordChange to true
+            tell defaults to setObject_forKey_(allowPasswordChange, "allowPasswordChange")
+            log " Password change enabled..."
+        end if
+    end toggleAllowPasswordChange_
+
+    -- Bound to Password Check Interval item in prefs window
+    on passwordCheckIntervalSet_(sender)
+        -- Set to integer value
+        set passwordCheckInterval to sender's intValue() as integer
+        -- Update plist
+        tell defaults to setObject_forKey_(passwordCheckInterval, "passwordCheckInterval")
+    end passwordCheckIntervalSet_
+
+
 -- Bound to Revert button in Prefs window (REMOVE ON RELEASE)
     on revertDefaults_(sender)
         tell defaults to removeObjectForKey_("menu_title")
@@ -637,6 +1178,15 @@ Enable it now?" with icon 2 buttons {"No", "Yes"} default button 2)
         tell defaults to removeObjectForKey_("pwPolicyButton")
         tell defaults to removeObjectForKey_("mavAccTest")
         tell defaults to removeObjectForKey_("enableKerbMinder")
+        tell defaults to removeObjectForKey_("enableKeychainLockCheck")
+        tell defaults to removeObjectForKey_("selectedBehaviour")
+        tell defaults to removeObjectForKey_("isBehaviour2Enabled")
+        tell defaults to removeObjectForKey_("changePasswordPromptWindowTitle")
+        tell defaults to removeObjectForKey_("pwPolicyURLButtonTitle")
+        tell defaults to removeObjectForKey_("pwPolicyURLButtonURL")
+        tell defaults to removeObjectForKey_("pwPolicyURLButtonBrowser")
+        tell defaults to removeObjectForKey_("allowPasswordChange")
+        tell defaults to removeObjectForKey_("passwordCheckInterval")
         do shell script "defaults delete org.pmbuko.ADPassMon"
         retrieveDefaults_(me)
         statusMenuController's updateDisplay()
@@ -739,10 +1289,11 @@ Please choose your configuration options."
 	on applicationWillFinishLaunching_(aNotification)
         getOS_(me)
         regDefaults_(me) -- populate plist file with defaults (will not overwrite non-default settings))
-        accTest_(me)
         KerbMinderTest_(me)
         notifySetup_(me)
         retrieveDefaults_(me)
+        -- Check for Selected Behaviour
+        doSelectedBehaviourCheck_(me)
         createMenu_(me)
         canPassExpire_(me)
         if passExpires then
@@ -768,8 +1319,13 @@ Please choose your configuration options."
         
             watchForWake_(me)
         
-            -- Set a timer to trigger doProcess handler every 12 hrs and spawn notifications (if enabled).
-            NSTimer's scheduledTimerWithTimeInterval_target_selector_userInfo_repeats_(43200, me, "doProcess:", missing value, true)
+			-- set password check interval to seconds
+			set passwordCheckIntervalInSeconds to (passwordCheckInterval * 3600)
+			log "  Password check interval set to every " & passwordCheckInterval & " hours..."
+		
+			-- Set a timer to trigger doProcess handler to hours specified by passwordCheckInterval and spawn notifications (if enabled).
+			NSTimer's scheduledTimerWithTimeInterval_target_selector_userInfo_repeats_(passwordCheckIntervalInSeconds, me, "doProcess:", missing value, true)
+        
         else
             log "Password does not exipire. Stopping."
             updateMenuTitle_("[--]", "Your password does not expire.")
