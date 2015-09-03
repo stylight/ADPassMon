@@ -1,11 +1,10 @@
---
 --  ADPassMonAppDelegate.applescript
 --  ADPassMon
 --
---  Created by Peter Bukowinski on 3/24/11.
-
+--  Created by Peter Bukowinski on 3/24/11 (and updated many times since)
+--
 --  This software is released under the terms of the MIT license.
---  Copyright (C) 2014 by Peter Bukowinski
+--  Copyright (C) 2015 by Peter Bukowinski
 --
 --  Permission is hereby granted, free of charge, to any person obtaining a copy
 --  of this software and associated documentation files (the "Software"), to deal
@@ -24,37 +23,38 @@
 --  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 --  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 --  THE SOFTWARE.
---
+---------------------------------------------------------------------------------
 -- TO DO:
--- - possibly revise getSearchBase handler (#344) to only use the last two "DC=" pieces. Comment in handler
--- - Disable "Change Password" menu item when off domain network
 --
 -- FEATURE REQUESTS:
--- - enable mcx defaults hook for adding as login item.
+-- - Enable mcx defaults hook for adding as login item.
 
 script ADPassMonAppDelegate
 
 --- PROPERTIES ---    
 
 --- Classes
-	property parent : class "NSObject"
-    property NSMenu : class "NSMenu"
-	property NSMenuItem : class "NSMenuItem"
-    property NSTimer : class "NSTimer" -- so we can do stuff at regular intervals
-    property NSWorkspace : class "NSWorkspace" -- for sleep notification
+    property parent :                   class "NSObject"
+    property NSMenu :                   class "NSMenu"
+    property NSThread :                 class "NSThread" -- for 'sleep'-like feature
+    property NSMenuItem :               class "NSMenuItem"
+    property NSTimer :                  class "NSTimer" -- so we can do stuff at regular intervals
+    property NSUserNotificationCenter : class "NSUserNotificationCenter" -- for notification center
+    property NSWorkspace :              class "NSWorkspace" -- for sleep notification
 
 --- Objects
     property standardUserDefaults : missing value
-    property statusMenu : missing value
+    property statusMenu :           missing value
     property statusMenuController : missing value
-    property theWindow : missing value
-    property defaults : missing value -- for saved prefs
-    property theMessage : missing value -- for stats display in pref window -- consider removing
-    property manualExpireDays : missing value
-    property selectedMethod : missing value
-    property warningDays : missing value
-    property thePassword : missing value
-    property toggleNotifyButton : missing value
+    property theWindow :            missing value
+    property defaults :             missing value -- for saved prefs
+    property theMessage :           missing value -- for stats display in pref window
+    property manualExpireDays :     missing value
+    property selectedMethod :       missing value
+    property thePassword :          missing value
+    property toggleNotifyButton :   missing value
+    property processTimer :         missing value
+    property domainTimer :          missing value
     property passwordPromptWindow : missing value
     property passwordPromptWindowText : missing value
     property passwordPromptWindowTitle : missing value
@@ -62,9 +62,9 @@ script ADPassMonAppDelegate
     property changePasswordPromptWindowTitle : "Change Password"
     property changePasswordPromptWindowButton1 : "Change"
     property changePasswordPromptWindowText : "Please fill out all fields below.
-
+    
 You need to be connected to your company's or institute's network to update your password, & to comply with any password policy set.
-
+    
 Your login keychain will also be updated."
     property oldPassword : missing value
     property newPassword : missing value
@@ -78,22 +78,26 @@ Your login keychain will also be updated."
     property unlockKeychainPasswordWindowTitle : "Your Keychain is Locked!"
     property unlockKeychainPasswordWindowButton1 : "Update"
     property unlockKeychainPasswordWindowText : "If you know the last password you used to login to the Mac, please fill out all the fields below & then click Update.
-
-If you do not know the Keychain password, enter your new password in the new & verify fields. Then click 'Create New Keychain'"
+    
+    If you do not know the Keychain password, enter your new password in the new & verify fields. Then click 'Create New Keychain'"
     property pwPolicyTest : missing value
     property pwPolicyString : missing value
 
 --- Booleans
-    property isIdle : true
-    property isHidden : false
-    property isManualEnabled : false
-    property enableNotifications : false
-    property enableKerbMinder : false
-    property prefsLocked : false
-    property launchAtLogin : false
-    property skipKerb : false
-    property showChangePass : false
-    property KerbMinderInstalled : false
+    property first_run :            true
+    property isIdle :               true
+    property isHidden :             false
+    property isManualEnabled :      false
+    property enableNotifications :  true
+    property enableKerbMinder :     false
+    property prefsLocked :          false
+    property launchAtLogin :        false
+    property skipKerb :             false
+    property onDomain :             false
+    property passExpires :          true
+    property goEasy :               false
+    property showChangePass :       false
+    property KerbMinderInstalled :  false
     property enablePasswordPromptWindowButton2 : false
     property firstPasswordCheckPassed : true
     property userPasswordChanged : false
@@ -103,47 +107,50 @@ If you do not know the Keychain password, enter your new password in the new & v
     property enablePasswordPolicy : false
     property keychainPolicyEnabled : false
     property passwordCheckPassed : false
-   
+    
 --- Other Properties
-    property mavAccTest : 1
-    property tooltip : "Waiting for data…"
-    property osVersion : ""
-    property kerb : ""
-    property myLDAP : ""
-    property mySearchBase : ""
-    property expireAge : ""
-    property expireAgeUnix : ""
-    property passExpires : true
-    property uAC : ""
-    property pwdSetDate : ""
-    property pwdSetDateUnix : ""
-    property plistPwdSetDate : 0
-    property pwPolicy : ""
-    property pwPolicyButton : "OK"
-    property today : ""
-    property todayUnix : ""
-    property daysUntilExp : ""
+    property warningDays :      14
+    property menu_title :       "[ ? ]"
+    property accTest :          1
+    property tooltip :          "Waiting for data…"
+    property osVersion :        ""
+    property kerb :             ""
+    property myLDAP :           ""
+    property mySearchBase :     ""
+    property expireAge :        0
+    property expireAgeUnix :    ""
+    property expireDate:        ""
+    property expireDateUnix:    ""
+    property uAC :              ""
+    property pwdSetDate :       ""
+    property pwdSetDateUnix :   0
+    property plistPwdSetDate :  0
+    property pwPolicy :         ""
+    property pwPolicyButton :   "OK"
+    property today :            ""
+    property todayUnix :        ""
+    property daysUntilExp :     ""
     property daysUntilExpNice : ""
-    property expirationDate : ""
-    property mavAccStatus : ""
+    property expirationDate :   ""
+    property mavAccStatus :     ""
+    property passwordCheckInterval :    4  -- hours
+    property enableKeychainLockCheck : ""
     property selectedBehaviour : 1
     property keychainPolicy : ""
     property pwPolicyURLButtonTitle : ""
     property pwPolicyURLButtonURL : ""
     property pwPolicyURLButtonBrowser : ""
-    property passwordCheckInterval : 12
     property keychainPolicyText : ""
-    property enableKeychainLockCheck : ""
 
 --- HANDLERS ---
-    
+
     -- General error handler
     on errorOut_(theError, showErr)
         log "Script Error: " & theError
         --if showErr = 1 then set my theMessage to theError as text
         --set isIdle to false
     end errorOut_
-    
+
     -- Need to get the OS version so we can handle Kerberos differently in 10.7+
     on getOS_(sender)
         set my osVersion to (do shell script "sw_vers -productVersion | awk -F. '{print $2}'") as integer
@@ -179,8 +186,8 @@ If you do not know the Keychain password, enter your new password in the new & v
                     accEnable_(me)
                 end if
             else -- if we're running 10.9 or later, Accessibility is handled differently
-                tell defaults to set my mavAccTest to objectForKey_("mavAccTest")
-                if mavAccTest is 1 then
+                tell defaults to set my accTest to objectForKey_("accTest")
+                if accTest as integer is 1 then
                     if "80" is in (do shell script "/usr/bin/id -G") then -- checks if user is in admin group
                         set accessDialog to (display dialog "ADPassMon's \"Change Password\" feature requires assistive access to open the password panel.
                         
@@ -194,16 +201,24 @@ If you do not know the Keychain password, enter your new password in the new & v
                                 log "  Not enabled"
                                 try
                                     do shell script "sqlite3 '/Library/Application Support/com.apple.TCC/TCC.db' \"INSERT INTO access VALUES('kTCCServiceAccessibility','org.pmbuko.ADPassMon',0,1,1,NULL);\"" with administrator privileges
-                                    set my mavAccTest to 0
-                                    tell defaults to setObject_forKey_(0, "mavAccTest")
+                                    set my accTest to 0
+                                    tell defaults to setObject_forKey_(0, "accTest")
                                 on error theError
                                     log "Unable to set access. Error: " & theError
                                 end try
                             else
+                                set my accTest to 0
+                                tell defaults to setObject_forKey_(0, "accTest")
                                 log "  Enabled"
                             end if
                         end if
+                    else
+                        set my accTest to 0
+                        tell defaults to setObject_forKey_(0, "accTest")
+                        log "  User not admin. Skipping."
                     end if
+                else
+                    log "  Enabled"
                 end if
             end if
         else
@@ -240,16 +255,6 @@ Enable it now?" with icon 2 buttons {"No", "Yes"} default button 2)
         end if
     end accEnable_
     
-    on KerbMinderTest_(sender)
-        tell application "Finder"
-            if exists "/Library/Application Support/crankd/KerbMinder.py" as POSIX file then
-                set my KerbMinderInstalled to true
-            else
-                set my KerbMinderInstalled to false
-            end if
-        end tell
-    end KerbMinderTest_
-    
     -- Check if Checking keychain lock is enabled
     on doKeychainLockCheck_(sender)
         tell defaults to set my enableKeychainLockCheck to objectForKey_("enableKeychainLockCheck") as integer
@@ -260,7 +265,7 @@ Enable it now?" with icon 2 buttons {"No", "Yes"} default button 2)
                 do shell script "security unlock-keychain -p ~/Library/Keychains/login.keychain"
                 set keychainState to "unlocked"
                 log "  Keychain unlocked..."
-            on error
+                on error
                 set keychainState to "locked"
             end try
             -- If keychain is locked, the prompt user...
@@ -268,28 +273,43 @@ Enable it now?" with icon 2 buttons {"No", "Yes"} default button 2)
                 log "  Keychain locked..."
                 closeKeychainAccess_(me)
             end if
-        else
+            else
             log "  Skipping Keychain Lock state check..."
         end if
     end doKeychainLockCheck_
+    
+    -- Check to see if KerbMinder installed
+    on KerbMinderTest_(sender)
+        tell application "Finder"
+            if exists "/Library/Application Support/crankd/KerbMinder.py" as POSIX file then
+                set my KerbMinderInstalled to true
+                log "  KerbMinder installed..."
+            else
+                set my KerbMinderInstalled to false
+            end if
+        end tell
+    end KerbMinderTest_
 
     -- Register plist default settings
     on regDefaults_(sender)
         tell current application's NSUserDefaults to set defaults to standardUserDefaults()
-        tell defaults to registerDefaults_({menu_title:"[ ? ]", ¬
+        tell defaults to registerDefaults_({menu_title: "[ ? ]", ¬
                                             tooltip:tooltip, ¬
+                                            fist_run:first_run, ¬
                                             selectedMethod:0, ¬
                                             isManualEnabled:isManualEnabled, ¬
-                                            expireAge:0, ¬
-                                            pwdSetDate:0, ¬
-                                            warningDays:14, ¬
+                                            enableNotifications:enableNotifications, ¬
+                                            passwordCheckInterval:passwordCheckInterval, ¬
+                                            expireAge:expireAge, ¬
+                                            expireDateUnix:expireDateUnix, ¬
+                                            pwdSetDate:pwdSetDate, ¬
+                                            warningDays:warningDays, ¬
                                             prefsLocked:prefsLocked, ¬
                                             myLDAP:myLDAP, ¬
                                             pwPolicy:pwPolicy, ¬
                                             pwPolicyButton:pwPolicyButton, ¬
-                                            mavAccTest:mavAccTest, ¬
+                                            accTest:accTest, ¬
                                             enableKerbMinder:enableKerbMinder, ¬
-                                            keychainPolicy:keychainPolicy, ¬
                                             launchAtLogin:launchAtLogin, ¬
                                             enableKeychainLockCheck:0, ¬
                                             selectedBehaviour:1, ¬
@@ -301,19 +321,24 @@ Enable it now?" with icon 2 buttons {"No", "Yes"} default button 2)
                                             passwordCheckInterval:passwordCheckInterval, ¬
                                             allowPasswordChange:allowPasswordChange })
     end regDefaults_
-    
+
     -- Get values from plist
-	on retrieveDefaults_(sender)
+    on retrieveDefaults_(sender)
+        tell defaults to set my menu_title to objectForKey_("menu_title")
+        tell defaults to set my first_run to objectForKey_("first_run")
         tell defaults to set my selectedMethod to objectForKey_("selectedMethod") as integer
         tell defaults to set my isManualEnabled to objectForKey_("isManualEnabled") as integer
-		tell defaults to set my expireAge to objectForKey_("expireAge") as integer
-		tell defaults to set my pwdSetDate to objectForKey_("pwdSetDate") as integer
+        tell defaults to set my enableNotifications to objectForKey_("enableNotifications") as integer
+        tell defaults to set my passwordCheckInterval to objectForKey_("passwordCheckInterval") as integer
+        tell defaults to set my expireAge to objectForKey_("expireAge") as integer
+        tell defaults to set my expireDateUnix to objectForKey_("expireDateUnix") as integer
+        tell defaults to set my pwdSetDate to objectForKey_("pwdSetDate") as integer
         tell defaults to set my warningDays to objectForKey_("warningDays")
         tell defaults to set my prefsLocked to objectForKey_("prefsLocked")
         tell defaults to set my myLDAP to objectForKey_("myLDAP")
         tell defaults to set my pwPolicy to objectForKey_("pwPolicy")
         tell defaults to set my pwPolicyButton to objectForKey_("pwPolicyButton")
-        tell defaults to set my mavAccTest to objectForKey_("mavAccTest")
+        tell defaults to set my accTest to objectForKey_("accTest") as integer
         tell defaults to set my enableKerbMinder to objectForKey_("enableKerbMinder")
         tell defaults to set my launchAtLogin to objectForKey_("launchAtLogin")
         tell defaults to set my enableKeychainLockCheck to objectForKey_("enableKeychainLockCheck") as integer
@@ -325,21 +350,23 @@ Enable it now?" with icon 2 buttons {"No", "Yes"} default button 2)
         tell defaults to set my pwPolicyURLButtonBrowser to objectForKey_("pwPolicyURLButtonBrowser") as string
         tell defaults to set my allowPasswordChange to objectForKey_("allowPasswordChange")
         tell defaults to set my passwordCheckInterval to objectForKey_ ("passwordCheckInterval") as integer
-	end retrieveDefaults_
+    end retrieveDefaults_
 
+    -- Disable notifications if running < 10.8
     on notifySetup_(sender)
         if osVersion is less than 8 then
             set my enableNotifications to false
-        else
-            set my enableNotifications to true
+        --else
+        --  set my enableNotifications to true
         end if
     end notifySetup_
-    
-    -- This handler is sent daysUntilExpNice and will trigger an alert if ≤ warningDays
+
+    -- This handler is sent daysUntilExpNice and will trigger an alert if ≤ warningDays --NEEDED?
     on doNotify_(sender)
         if sender as integer ≤ my warningDays as integer then
             if osVersion is greater than 7 then
-                if my enableNotifications is true then
+                if my enableNotifications as boolean is true then
+                    log "Triggering notification…"
                     set ncTitle to "Password Expiration Warning"
                     set ncMessage to "Your password will expire in " & sender & " days on " & expirationDate
                     sendNotificationWithTitleAndMessage_(ncTitle, ncMessage)
@@ -347,24 +374,62 @@ Enable it now?" with icon 2 buttons {"No", "Yes"} default button 2)
             end if
         end if
     end doNotify_
-    
+
+    -- Notifcation text
     on sendNotificationWithTitleAndMessage_(aTitle, aMessage)
         set myNotification to current application's NSUserNotification's alloc()'s init()
         set myNotification's title to aTitle
         set myNotification's informativeText to aMessage
         current application's NSUserNotificationCenter's defaultUserNotificationCenter's deliverNotification_(myNotification)
     end sendNotificationWithTitleAndMessage_
-        
+
     -- Trigger doProcess handler on wake from sleep
     on watchForWake_(sender)
         tell (NSWorkspace's sharedWorkspace())'s notificationCenter() to ¬
-            addObserver_selector_name_object_(me, "doProcess:", "NSWorkspaceDidWakeNotification", missing value)
+            addObserver_selector_name_object_(me, "doProcessWithWait:", "NSWorkspaceDidWakeNotification", missing value)
     end watchForWake_
-    
+
+    -- Open Ticket Viewer
     on ticketViewer_(sender)
         tell application "Ticket Viewer" to activate
     end ticketViewer_
     
+    -- Test to see if we're on the domain
+    on domainTest_(sender)
+        set domain to (do shell script "/usr/sbin/dsconfigad -show | /usr/bin/awk '/Active Directory Domain/{print $NF}'") as text
+        try
+            set digResult to (do shell script "/usr/bin/dig +time=2 +tries=1 -t srv _ldap._tcp." & domain) as text
+        on error theError
+            log "Domain test timed out."
+            set my onDomain to false
+            my statusMenu's itemWithTitle_("Refresh Kerberos Ticket")'s setEnabled_(0)
+            my statusMenu's itemWithTitle_("Change Password…")'s setEnabled_(0)
+            return
+        end try
+        if "ANSWER SECTION" is in digResult then
+            set my onDomain to true
+            my statusMenu's itemWithTitle_("Refresh Kerberos Ticket")'s setEnabled_(1)
+            -- Set variable to boolean
+            set allowPasswordChange to allowPasswordChange as boolean
+            -- If password change is  allowed, show
+            if allowPasswordChange is true then
+                my statusMenu's itemWithTitle_("Change Password…")'s setEnabled_(1)
+            -- If password change is not allowed, but a password policy is set, show (as this will show policy).
+            else if pwPolicyURLButtonTitle is not equal to "" and pwPolicyURLButtonURL is not equal to "" then
+                my statusMenu's itemWithTitle_("Change Password…")'s setEnabled_(1)
+            end if
+        else
+            set my onDomain to false
+            log "Domain not reachable."
+            my statusMenu's itemWithTitle_("Refresh Kerberos Ticket")'s setEnabled_(0)
+            my statusMenu's itemWithTitle_("Change Password…")'s setEnabled_(0)
+        end if
+    end domainTest_
+    
+    on intervalDomainTest_(sender)
+        domainTest_(me)
+    end intervalDomainTest_
+
     -- Check if password is set to never expire
     on canPassExpire_(sender)
         log "Testing if password can expire…"
@@ -383,10 +448,10 @@ Enable it now?" with icon 2 buttons {"No", "Yes"} default button 2)
             log "  Could not determine if password expires."
         end try
     end canPassExpire_
-    
+
     -- Checks for kerberos ticket, necessary for auto method. Also bound to Refresh Kerb menu item.
     on doKerbCheck_(sender)
-        if skipKerb is false then
+        if my onDomain is true and my skipKerb is false then
             if selectedMethod = 0 then
                 if osVersion is less than 7 then
                     try
@@ -400,8 +465,6 @@ Enable it now?" with icon 2 buttons {"No", "Yes"} default button 2)
                     on error theError
                         set my theMessage to "Kerberos ticket expired or not found"
                         log "  No ticket found"
-                        --updateMenuTitle_("[ ! ]", "Kerberos ticket expired or not found")
-                        -- offer to renew Kerberos ticket
                         activate
                         set response to (display dialog "No Kerberos ticket for Active Directory was found. Do you want to renew it?" with icon 1 buttons {"No","Yes"} default button "Yes")
                         if button returned of response is "Yes" then
@@ -423,7 +486,7 @@ Enable it now?" with icon 2 buttons {"No", "Yes"} default button 2)
             doProcess_(me)
         end if
     end doKerbCheck_
-    
+
     -- Need to handle Lion's kerberos differently from older OSes
     on doLionKerb_(sender)
         try
@@ -437,27 +500,25 @@ Enable it now?" with icon 2 buttons {"No", "Yes"} default button 2)
         on error theError
             set my theMessage to "Kerberos ticket expired or not found"
             log "  No ticket found"
-            --updateMenuTitle_("[ ! ]", "Kerberos ticket expired or not found")
-            -- offer to renew Kerberos ticket
             activate
             set response to (display dialog "No Kerberos ticket for Active Directory was found. Do you want to renew it?" with icon 2 buttons {"No","Yes"} default button "Yes")
             if button returned of response is "Yes" then
-				renewLionKerb_(me)
+                renewLionKerb_(me)
             else -- if No is clicked
                 log "  User chose not to acquire"
                 errorOut_(theError, 1)
             end if
         end try
     end doLionKerb_
-    
-	-- Runs when Yes of Lion kerberos renewal dialog (from above) is clicked.
-	on renewLionKerb_(sender)
-		try
-			set thePassword to text returned of (display dialog "Enter your Active Directory password:" default answer "" with hidden answer)
-			do shell script "/bin/echo '" & thePassword & "' | /usr/bin/kinit -l 10h -r 10h --password-file=STDIN"
+
+    -- Runs when Yes of Lion kerberos renewal dialog (from above) is clicked.
+    on renewLionKerb_(sender)
+        try
+            set thePassword to text returned of (display dialog "Enter your Active Directory password:" default answer "" with hidden answer)
+            do shell script "/bin/echo '" & thePassword & "' | /usr/bin/kinit -l 10h -r 10h --password-file=STDIN"
             log "  Ticket acquired"
-			display dialog "Kerberos ticket acquired." with icon 1 buttons {"OK"} default button 1
-			doLionKerb_(me)
+            display dialog "Kerberos ticket acquired." with icon 1 buttons {"OK"} default button 1
+            doLionKerb_(me)
         on error
             try
                 set thePassword to text returned of (display dialog "Password incorrect. Please try again:" default answer "" with icon 2 with hidden answer)
@@ -468,22 +529,61 @@ Enable it now?" with icon 2 buttons {"No", "Yes"} default button 2)
                 log "  Incorrect password. Skipping."
                 display dialog "Too many incorrect attempts. Stopping to avoid account lockout." with icon 2 buttons {"OK"} default button 1
             end try
-		end try
-	end renewLionKerb_
-    
-    -- Use scutil to get AD DNS info
+        end try
+    end renewLionKerb_
+
+    -- ad node with scutil fallback to get AD DNS info
     on getDNS_(sender)
         try
-            -- "first word of" added for 10.7 compatibility, which may return more than one item
-            set my myLDAP to first word of (do shell script "/usr/sbin/scutil --dns | /usr/bin/awk '/nameserver\\[0\\]/{print $3}'") as text
+            -- find source of user node
+            set originalNodeName to (do shell script "/usr/bin/dscl localhost read /Search/Users/$USER OriginalNodeName | grep -o -e '/.*'") as text
+            if (count words of originalNodeName) > 0
+                set my myLDAP to (do shell script "/usr/bin/dscl localhost read '" & originalNodeName & "' ServerConnection | /usr/bin/awk '/ServerConnection/{print $2}'") as text
+                set my mySearchBase to (do shell script "/usr/bin/dscl localhost read '" & originalNodeName & "' LDAPSearchBaseSuffix | /usr/bin/awk '/LDAPSearchBaseSuffix/{print $2}'") as text
+            end if
+        
+            if (count words of myLDAP) = 0
+                -- "first word of" added for 10.7 compatibility, which may return more than one item
+                set my myLDAP to first word of (do shell script "/usr/sbin/scutil --dns | /usr/bin/awk '/nameserver\\[0\\]/{print $3}'") as text
+            end if
         on error theError
             errorOut_(theError)
         end try
         log "  myLDAP: " & myLDAP
     end getDNS_
-    
-    -- Use ldapsearch to get search base
+
+    -- Use dsconfigad to get domain name
+    -- Use dig to get AD LDAP server from domain name
+    on getADLDAP_(sender)
+        try
+            set myDomain to (do shell script "/usr/sbin/dsconfigad -show | /usr/bin/awk '/Active Directory Domain/{print $NF}'") as text
+            try
+                set myLDAPresult to (do shell script "/usr/bin/dig +time=2 +tries=1 -t srv _ldap._tcp." & myDomain) as text
+            on error theError
+                log "Domain test timed out."
+                set my onDomain to false
+            end try
+            if "ANSWER SECTION" is in myLDAPresult then
+                set my onDomain to true
+                -- using "first paragraph" to return only the first ldap server returned by the query
+                set myLDAP to last paragraph of (do shell script "/usr/bin/dig -t srv _ldap._tcp." & myDomain & "| /usr/bin/awk '/^_ldap/{print $NF}'") as text
+                log "  myDomain: " & myDomain
+                log "  myADLDAP: " & myLDAP
+            else
+                set my onDomain to false
+                log "  Can't reach " & myDomain & " domain"
+            end if
+        on error theError
+            errorOut_(theError)
+        end try
+    end getADLDAP_
+
+    -- Use ldapsearch to get search base if OriginalNodeName method didn't work
     on getSearchBase_(sender)
+        if (count of words of my mySearchBase) > 0
+            return
+        end if
+
         try
             set my mySearchBase to (do shell script "/usr/bin/ldapsearch -LLL -Q -s base -H ldap://" & myLDAP & " defaultNamingContext | /usr/bin/awk '/defaultNamingContext/{print $2}'") as text
                 -- awk -F, '/rootDomainNamingContext/{print $(NF-1)","$NF}' to take only last two search base fields
@@ -496,15 +596,19 @@ Enable it now?" with icon 2 buttons {"No", "Yes"} default button 2)
     -- Use ldapsearch to get password expiration age
     on getExpireAge_(sender)
         try
-            set my expireAgeUnix to (do shell script "/usr/bin/ldapsearch -LLL -Q -s base -H ldap://" & myLDAP & " -b " & mySearchBase & " maxPwdAge | /usr/bin/awk -F- '/maxPwdAge/{print $2/10000000}'") as integer
-            set my expireAge to expireAgeUnix / 86400 as integer
-            log "  Got expireAge: " & expireAge
-            tell defaults to setObject_forKey_(expireAge, "expireAge")
+            set my expireAgeUnix to (do shell script "/usr/bin/ldapsearch -LLL -Q -s base -H ldap://" & myLDAP & " -b " & mySearchBase & " maxPwdAge | /usr/bin/awk -F- '/maxPwdAge/{print $NF/10000000}'") as integer
+            if expireAgeUnix is equal to 0 then
+                log "  Couldn't get expireAge. Trying using Manual method."
+            else
+                set my expireAge to expireAgeUnix / 86400 as integer
+                log "  Got expireAge: " & expireAge
+                tell defaults to setObject_forKey_(expireAge, "expireAge")
+            end if
         on error theError
             errorOut_(theError, 1)
         end try
     end getExpireAge_
-    
+
     -- Determine when the password was last changed
     on getPwdSetDate_(sender)
         -- number formatter for truncated decimal places
@@ -514,15 +618,15 @@ Enable it now?" with icon 2 buttons {"No", "Yes"} default button 2)
         fmt's setMinimumSignificantDigits_(1)
         fmt's setDecimalSeparator_(".")
         
-        set my pwdSetDateUnix to (do shell script "/usr/bin/dscl localhost read /Search/Users/$USER SMBPasswordLastSet | /usr/bin/awk '/LastSet:/{print $2}'")
-        if (count words of pwdSetDateUnix) is greater than 1 then
+        set my pwdSetDateUnix to (do shell script "/usr/bin/dscl localhost read /Search/Users/\"$USER\" SMBPasswordLastSet | /usr/bin/awk '/LastSet:/{print $2}'")
+        if (count words of pwdSetDateUnix) is greater than 0 then
             set my pwdSetDateUnix to last word of pwdSetDateUnix
+            set my pwdSetDateUnix to ((pwdSetDateUnix as integer) / 10000000 - 11644473600)
+            set my pwdSetDate to fmt's stringFromNumber_(pwdSetDateUnix / 86400)
+        else if (count words of pwdSetDateUnix) is equal to 0 then
+            set my pwdSetDate to -1
         end if
-        set my pwdSetDateUnix to ((pwdSetDateUnix as integer) / 10000000 - 11644473600)
-        set my pwdSetDate to fmt's stringFromNumber_(pwdSetDateUnix / 86400)
         log "  New pwdSetDate (" & pwdSetDate & ")"
-        
-        
         -- Now we compare the plist's value for pwdSetDate to the one we just calculated so
         -- we avoid using an old or bad value (i.e. when SMBPasswordLastSet can't be found by dscl)
         tell defaults to set plistPwdSetDate to objectForKey_("pwdSetDate") as real
@@ -549,7 +653,37 @@ Enable it now?" with icon 2 buttons {"No", "Yes"} default button 2)
             statusMenu's itemWithTitle_("Change Password…")'s setEnabled_(not skipKerb)
         end if
     end getPwdSetDate_
+
+    -- Uses 'msDS-UserPasswordExpiryTimeComputed' value from AD to get expiration date.
+    on easyMethod_(sender)
+        try
+            set userName to short user name of (system info)
+            set expireDateResult to  (do shell script "/usr/bin/dscl localhost read /Search/Users/" & userName & " msDS-UserPasswordExpiryTimeComputed")
+            if "msDS-UserPasswordExpiryTimeComputed" is in expireDateResult then
+                set my goEasy to true
+                set my expireDate to last word of expireDateResult
+            else
+                set my goEasy to false
+                return
+            end if
+            set my expireDateUnix to do shell script "echo '(" & expireDate & "/10000000)-11644473600' | /usr/bin/bc"
+            log "  Got expireDateUnix: " & expireDateUnix
+            tell defaults to setObject_forKey_(expireDateUnix, "expireDateUnix")
+        on error theError
+            errorOut_(theError, 1)
+        end try
+    end easyMethod_
     
+    on easyDate_(timestamp)
+        set my expirationDate to do shell script "/bin/date -r " & timestamp
+        set todayUnix to do shell script "/bin/date +%s"
+        set my daysUntilExp to ((timestamp - todayUnix) / 86400)
+        log "    daysUntilExp: " & daysUntilExp
+        set my daysUntilExpNice to round daysUntilExp rounding toward zero
+        --log "    daysUntilExpNice: " & daysUntilExpNice
+    end easyDate_
+    
+
     -- Calculate the number of days until password expiration
     on compareDates_(sender)
         -- number formatter for truncated decimal places
@@ -564,13 +698,13 @@ Enable it now?" with icon 2 buttons {"No", "Yes"} default button 2)
             set my daysUntilExp to fmt's stringFromNumber_(expireAge - (today - pwdSetDate)) as real -- removed 'as integer' to avoid rounding issue
             log "  daysUntilExp: " & daysUntilExp
             set my daysUntilExpNice to round daysUntilExp rounding toward zero
-            log "  daysUntilExpNice: " & daysUntilExpNice
+            --log "  daysUntilExpNice: " & daysUntilExpNice
         on error theError
             errorOut_(theError, 1)
         end try
     end compareDates_
-    
-    -- Get the full date of password expiration but strip off the time. daysUntilExp is input.
+
+    -- Get the full date of password expiration. daysUntilExp is input.
     on getExpirationDate_(remaining)
         set fullDate to (current date) + (remaining * days) as text
         --set my expirationDate to text 1 thru ((offset of ":" in fullDate) - 3) of fullDate -- this truncates the time
@@ -584,38 +718,55 @@ Enable it now?" with icon 2 buttons {"No", "Yes"} default button 2)
         tell defaults to setObject_forKey_(tooltip, "tooltip")
         statusMenuController's updateDisplay()
     end updateMenuTitle_
-    
+
     -- The meat of the app; gets the data and does the calculations 
     on doProcess_(sender)
+        domainTest_(me)
         if selectedMethod = 0 then
             log "Starting auto process…"
-            else
+        else
             log "Starting manual process…"
         end if
+        
         try
-            theWindow's displayIfNeeded()
-            set my isIdle to false
-            set my theMessage to "Working…"
+            if my onDomain is true then
+                theWindow's displayIfNeeded()
+                set my isIdle to false
+                set my theMessage to "Working…"
             
-            -- Do this if we haven't run before, or the defaults have been reset.
-            if my expireAge = 0 and my selectedMethod = 0 then
-                getDNS_(me)
-                getSearchBase_(me)
-                getExpireAge_(me)
-            else
-                log "  Found expireAge in plist: " & expireAge
-            end if
-            
-            getPwdSetDate_(me)
-            compareDates_(me)
-            getExpirationDate_(daysUntilExp)
-            updateMenuTitle_("[" & daysUntilExpNice & "d]", "Password expires on " & expirationDate)
-            
-            set my theMessage to "Your password will expire in " & daysUntilExpNice & " days on
-" & expirationDate
-            set my isIdle to true
+                -- Do this if we haven't run before, or the defaults have been reset.
+                if my expireDateUnix = 0 and my selectedMethod = 0 then
+                    getADLDAP_(me)
+                    easyMethod_(me)
+                    if my goEasy is false then
+                        getSearchBase_(me)
+                        getExpireAge_(me)
+                    end if
+                else
+                    log "  Found expireDateUnix in plist: " & expireDateUnix
+                    easyMethod_(me)
+                end if
 
-            doNotify_(daysUntilExpNice)
+                if my goEasy is true and my selectedMethod = 0 then
+                    log "  Using msDS method"
+                    easyDate_(expireDateUnix)
+                else
+                    log "  Using alt method"
+                    getPwdSetDate_(me)
+                    compareDates_(me)
+                    getExpirationDate_(daysUntilExp)
+                end if
+                
+                updateMenuTitle_((daysUntilExpNice as string) & "d", "Your password expires\n" & expirationDate)
+                
+                set my theMessage to "Your password expires in " & daysUntilExpNice & " days\non " & expirationDate
+                set my isIdle to true
+                
+                doNotify_(daysUntilExpNice)
+            
+            else
+                log " Stopping."
+            end if
         on error theError
             errorOut_(theError, 1)
         end try
@@ -623,7 +774,16 @@ Enable it now?" with icon 2 buttons {"No", "Yes"} default button 2)
         doSelectedBehaviourCheck_(me)
         -- Check for Keychain Lock
         doKeychainLockCheck_(me)
-	end doProcess_
+    end doProcess_
+    
+    on doProcessWithWait_(sender)
+        tell current application's NSThread to sleepForTimeInterval_(15)
+        doProcess_(me)
+    end doProcessWithWait_
+
+    on intervalDoProcess_(sender)
+        doProcess_(me)
+    end intervalDoProcess_
 
 --- INTERFACE BINDING HANDLERS ---
 
@@ -632,15 +792,17 @@ Enable it now?" with icon 2 buttons {"No", "Yes"} default button 2)
         activate
         current application's NSApp's orderFrontStandardAboutPanel_(null)
     end about_
-    
+
     -- Bound to Change Password menu item
     on changePassword_(sender)
         -- Open System Preferences if Behaviour 1 is set
         if selectedBehaviour is 1 then
             tell defaults to set my pwPolicy to objectForKey_("pwPolicy") as string
+            -- Display password policy
             if my pwPolicy is not "" then
                 pwPolicyDisplay_(me)
             end if
+            -- Open System Preferences
             tell application "System Preferences"
                 try -- to use UI scripting
                     set current pane to pane id "com.apple.preferences.users"
@@ -657,7 +819,7 @@ Enable it now?" with icon 2 buttons {"No", "Yes"} default button 2)
                             end if
                         end tell
                     end tell
-                    on error theError
+                on error theError
                     errorOut_(theError, 1)
                 end try
             end tell
@@ -672,12 +834,12 @@ Enable it now?" with icon 2 buttons {"No", "Yes"} default button 2)
             end if
             -- If user did not chose to update externally or was not prompted, then continue
             if pwPolicyUpdateExternal is false
-                -- Set passwordPromptWindows settings
-                set my enablePasswordPromptWindowButton2 to false
-                set my passwordPromptWindowText to changePasswordPromptWindowText
-                showPasswordPromptWindow_(me)
-            end if
+            -- Set passwordPromptWindows settings
+            set my enablePasswordPromptWindowButton2 to false
+            set my passwordPromptWindowText to changePasswordPromptWindowText
+            showPasswordPromptWindow_(me)
         end if
+    end if
     end changePassword_
 
     -- Check to see if Keychain Access is open, as can cause some issues. Prompt use to close
@@ -755,7 +917,6 @@ Enable it now?" with icon 2 buttons {"No", "Yes"} default button 2)
                 else
                     keychainPasswordPrompt_(me)
                 end if
-
             else
                 -- set to boolean of value
                 set my keychainCreateNew to keychainCreateNew as boolean
@@ -780,43 +941,41 @@ Enable it now?" with icon 2 buttons {"No", "Yes"} default button 2)
         else
             set userPasswordChanged to true
             updateKeychainPassword_(me)
-    end if
+        end if
     end attemptChangePassword_
 
     -- Try & reset the users password via dscl
     on updatePassword_(sender)
         try
-            --log "Attempting user password change.."
+            log "Attempting user password change.."
             do shell script "dscl . -passwd /Users/$USER " & quoted form of enteredOldPassword & " " & quoted form of enteredNewPassword
             log "Password changed!"
             set userPasswordChanged to true
-            
             -- Set Keychain settings to make sure they are unlocked
             setKeychainSettings_(me)
-            
             on error errStr
-            -- Errors if not connected to company/institutes network
-            if errStr contains "eDSServiceUnavailable" then
-                log "Password change failed. Please verify that you are connected to your companies/institutes network & try again"
-                display dialog "Password change failed. Please verify that you are connected to your company's/institute's network & try again" with icon 2 buttons {"OK"} default button "OK"
-                if button returned of the result is "OK" then
-                    changePassword_(me)
-                end if
+                -- Errors if not connected to company/institutes network
+                if errStr contains "eDSServiceUnavailable" then
+                    log "Password change failed. Please verify that you are connected to your companies/institutes network & try again"
+                    display dialog "Password change failed. Please verify that you are connected to your company's/institute's network & try again" with icon 2 buttons {"OK"} default button "OK"
+                    if button returned of the result is "OK" then
+                        changePassword_(me)
+                    end if
                 -- Errors if password change fails due to old pass being wrong or new pass not meeting password policy requirements
                 else if errStr contains "eDSAuthMethodNotSupported" then
                     log "Password change failed. Please verify that you have entered the correct password in the Old Password field & that your New Password meets your company's/institute's password policy"
                     display dialog "Password change failed. Please verify that you have entered the correct password in the Old Password field & that your New Password meets your company's/institute's password policy" with icon 2 buttons {"OK"} default button "OK"
-                if button returned of the result is "OK" then
-                    changePassword_(me)
-                end if
+                    if button returned of the result is "OK" then
+                        changePassword_(me)
+                    end if
                 -- Oops, not sure what happened.. :(
-            else
+                else
                     log "Password change failed. Please try again."
                     display dialog "Password change failed. Please try again." with icon 2 buttons {"OK"} default button "OK"
                     if button returned of the result is "OK" then
                         changePassword_(me)
                     end if
-            end if
+                end if
         end try
     end updatePassword_
 
@@ -824,35 +983,35 @@ Enable it now?" with icon 2 buttons {"No", "Yes"} default button 2)
     on updateKeychainPassword_(sender)
         -- If we've changed password
         if userPasswordChanged is equal to true
-            try
-                -- Log Action
-                log "Attempting Keychain unlock.."
-                -- Unlock the keychain
-                do shell script "security unlock-keychain -p " & quoted form of enteredOldPassword & " ~/Library/Keychains/login.keychain"
-                -- Make sure that the Keychains password is set to what the new password
-                log "Attempting keychain password update.."
-                -- Set keychain password
-                do shell script "security set-keychain-password -o " & quoted form of enteredOldPassword & " -p " & quoted form of enteredNewPassword & " ~/Library/Keychains/login.keychain"
-                -- Log Action
-                log "Keychain successfully updated!"
-                -- Close the password prompt window
-                closePasswordPromptWindow_(me)
-                -- Advise the user that it's worked
-                display dialog "Update successful!" with icon 1 buttons ("OK") default button {"OK"}
-                -- Set to front window
-                tell application "System Events" to set frontmost of process "ADPassMon" to true
-            on error
-                -- Log Action
-                log "Keychain update failed!"
-                -- Display dialog to user
-                display dialog "Keychain update failed. Please try again" with icon 2 buttons {"OK"} default button "OK"
-                -- If OK button is clicked
-                if button returned of the result is "OK" then
-                    -- Try & update the users keychain password
-                    keychainPasswordPrompt_(me)
-                end if
-            end try
-        end if
+        try
+            -- Log Action
+            log "Attempting Keychain unlock.."
+            -- Unlock the keychain
+            do shell script "security unlock-keychain -p " & quoted form of enteredOldPassword & " ~/Library/Keychains/login.keychain"
+            -- Make sure that the Keychains password is set to what the new password
+            log "Attempting keychain password update.."
+            -- Set keychain password
+            do shell script "security set-keychain-password -o " & quoted form of enteredOldPassword & " -p " & quoted form of enteredNewPassword & " ~/Library/Keychains/login.keychain"
+            -- Log Action
+            log "Keychain successfully updated!"
+            -- Close the password prompt window
+            closePasswordPromptWindow_(me)
+            -- Advise the user that it's worked
+            display dialog "Update successful!" with icon 1 buttons ("OK") default button {"OK"}
+            -- Set to front window
+            tell application "System Events" to set frontmost of process "ADPassMon" to true
+        on error
+            -- Log Action
+            log "Keychain update failed!"
+            -- Display dialog to user
+            display dialog "Keychain update failed. Please try again" with icon 2 buttons {"OK"} default button "OK"
+            -- If OK button is clicked
+            if button returned of the result is "OK" then
+                -- Try & update the users keychain password
+                keychainPasswordPrompt_(me)
+            end if
+        end try
+    end if
     end updateKeychainPassword_
 
     on createNewKeychainButton_(sender)
@@ -881,7 +1040,7 @@ Enable it now?" with icon 2 buttons {"No", "Yes"} default button 2)
                 try
                     do shell script "security delete-keychain ~/Library/Keychains/login.keychain"
                     log "Deleted old login.keychain..."
-                on error -- If cannot find the login keychain, then prompt to create a new one.
+                    on error -- If cannot find the login keychain, then prompt to create a new one.
                     log "Couldn't find old Login Keychain..."
                     cannotFindKeychain_(me)
                 end try
@@ -898,12 +1057,12 @@ Enable it now?" with icon 2 buttons {"No", "Yes"} default button 2)
                     restart
                 end tell
                 
-            else
+                else
                 -- Delete the login Keychain
                 try
                     do shell script "security delete-keychain ~/Library/Keychains/login.keychain"
                     log "Deleted old keychain..."
-                on error -- If cannot find the login keychain, then prompt to create a new one.
+                    on error -- If cannot find the login keychain, then prompt to create a new one.
                     log "Couldn't find old Login Keychain..."
                     cannotFindKeychain_(me)
                 end try
@@ -917,7 +1076,7 @@ Enable it now?" with icon 2 buttons {"No", "Yes"} default button 2)
                 -- Close the password prompt window
                 closePasswordPromptWindow_(me)
             end if
-        on error
+            on error
             log "Creating a new keychain failed..."
             display dialog "New Keychain creation failed. Please try again" with icon 2 buttons {"OK"} default button "OK"
             if button returned of the result is "OK" then
@@ -941,7 +1100,7 @@ Enable it now?" with icon 2 buttons {"No", "Yes"} default button 2)
             log "Set to not lock at after time"
             --recheck expiration
             doProcess_(me)
-        on error
+            on error
             -- Log Action
             log "Error setting login.keychain settings..."
         end try
@@ -987,7 +1146,7 @@ Enable it now?" with icon 2 buttons {"No", "Yes"} default button 2)
                 display dialog pwPolicy with icon 2 buttons {"OK"}
             end tell
             -- If both pwPolicyURLButtonTitle or pwPolicyURLButtonURL are set, then display second button
-        else if pwPolicyURLButtonTitle is not equal to "" and pwPolicyURLButtonURL is not equal to "" then
+            else if pwPolicyURLButtonTitle is not equal to "" and pwPolicyURLButtonURL is not equal to "" then
             -- Display password policy dialog
             tell application "System Events"
                 display dialog pwPolicy with icon 2 buttons {"OK", pwPolicyURLButtonTitle}
@@ -1000,8 +1159,8 @@ Enable it now?" with icon 2 buttons {"No", "Yes"} default button 2)
                     open location pwPolicyURLButtonURL
                     -- If users chose the URL, then we don't want to proceed
                     set pwPolicyUpdateExternal to true
-                    -- If pwPolicyURLBrowser is set, then open pwPolicyURLButtonURL in the selected browser
-                    else
+                -- If pwPolicyURLBrowser is set, then open pwPolicyURLButtonURL in the selected browser
+                else
                     -- Open URL in the selected browser
                     tell application pwPolicyURLButtonBrowser to open location pwPolicyURLButtonURL
                     -- Bring selected browser to front
@@ -1011,7 +1170,7 @@ Enable it now?" with icon 2 buttons {"No", "Yes"} default button 2)
                     -- If users chose the URL, then we don't want to proceed
                     set pwPolicyUpdateExternal to true
                 end if
-            else
+                else
                 -- Set variable to boolean
                 set allowPasswordChange to allowPasswordChange as boolean
                 -- If password change is  not allowed, then proceed
@@ -1024,15 +1183,16 @@ Enable it now?" with icon 2 buttons {"No", "Yes"} default button 2)
     end pwPolicyDisplay_
 
     -- Bound to Prefs menu item
-	on showMainWindow_(sender)
-		activate
-		theWindow's makeKeyAndOrderFront_(null)
-	end showMainWindow_
+    on showMainWindow_(sender)
+        activate
+        theWindow's makeKeyAndOrderFront_(null)
+    end showMainWindow_
 
-    -- Bound to Prefs menu item
+    -- Open Password Prompt window
     on showPasswordPromptWindow_(sender)
         activate
-        passwordPromptWindow's makeKeyAndOrderFront_(null)
+        passwordPromptWindow's makeKeyAndOrderFront_(me)
+        set passwordPromptWindow's level to 3
     end showPasswordPromptWindow_
 
     -- Close the Prefs Menu
@@ -1047,8 +1207,8 @@ Enable it now?" with icon 2 buttons {"No", "Yes"} default button 2)
 
     -- Bound to Quit menu item
     on quit_(sender)
-		quit
-	end quit_
+        quit
+    end quit_
 
     -- Bound to Auto radio buttons and Manual text field in Prefs window
     on useManualMethod_(sender)
@@ -1065,11 +1225,14 @@ Enable it now?" with icon 2 buttons {"No", "Yes"} default button 2)
             set my isHidden to false
             set my isManualEnabled to false
             set my selectedMethod to 0
-            set my expireAge to 0
+            set my expireAge to ""
+            set my expireDateUnix to 0
             set my manualExpireDays to ""
             tell defaults to removeObjectForKey_("expireAge")
+            tell defaults to removeObjectForKey_("expireDateUnix")
             tell defaults to setObject_forKey_(0, "selectedMethod")
-            tell defaults to setObject_forKey_(0, "expireAge")
+            tell defaults to setObject_forKey_("", "expireAge")
+            tell defaults to setObject_forKey_(0, "expireDateUnix")
             doKerbCheck_(me)
         end if
     end useManualMethod_
@@ -1100,30 +1263,60 @@ Enable it now?" with icon 2 buttons {"No", "Yes"} default button 2)
     on setWarningDays_(sender)
         set my warningDays to sender's intValue() as integer
         tell defaults to setObject_forKey_(warningDays, "warningDays")
+        log "Set warning days to " & warningDays
     end setWarningDays_
+
+    -- Bound to passwordCheckInterval box in Prefs window
+    on passwordCheckIntervalCheck_(sender)
+        set my passwordCheckInterval to sender's intValue() as integer
+        -- If we have a value
+        if my passwordCheckInterval is not equal to missing value
+            -- Set to integer of value
+            set passwordCheckInterval to passwordCheckInterval as integer
+            -- Move to timer function
+            setpasswordCheckInterval_(me)
+        end if
+    end passwordCheckIntervalCheck_
+
+    -- Timer function
+    on setpasswordCheckInterval_(sender)
+        processTimer's invalidate() -- kills the existing timer
+        tell defaults to setObject_forKey_(passwordCheckInterval, "passwordCheckInterval")
+        -- start a timer with the new interval
+        set processTimer to current application's NSTimer's scheduledTimerWithTimeInterval_target_selector_userInfo_repeats_((my passwordCheckInterval * 3600), me, "intervalDoProcess:", missing value, true)
+        set unit to " hours"
+        if passwordCheckInterval is equal to 1 then
+            set unit to " hour"
+        end if
+        log "Set check interval to " & passwordCheckInterval & unit
+    end setpasswordCheckInterval_
 
     -- Bound to Notify items in menu and Prefs window
     on toggleNotify_(sender)
-        if my enableNotifications is true then
+        if my enableNotifications as boolean is true then
             set my enableNotifications to false
-            tell defaults to setObject_forKey_(enableNotifications, "enableNotifications")
             my statusMenu's itemWithTitle_("Use Notifications")'s setState_(0)
+            tell defaults to setObject_forKey_(enableNotifications, "enableNotifications")
+            log "Disabled notifications."
         else
             set my enableNotifications to true
-            tell defaults to setObject_forKey_(enableNotifications, "enableNotifications")
             my statusMenu's itemWithTitle_("Use Notifications")'s setState_(1)
+            tell defaults to setObject_forKey_(enableNotifications, "enableNotifications")
+            log "Enabled notifications."
         end if
     end toggleNotify_
     
     on toggleKerbMinder_(sender)
-        if my enableKerbMinder is true then
+        if my enableKerbMinder as boolean is true then
             set my enableKerbMinder to false
-            tell defaults to setObject_forKey_(enableKerbMinder, "enableKerbMinder")
             my statusMenu's itemWithTitle_("Use KerbMinder")'s setState_(0)
+            tell defaults to setObject_forKey_(enableKerbMinder, "enableKerbMinder")
+            log "Disabled KerbMinder."
         else
             set my enableKerbMinder to true
-            tell defaults to setObject_forKey_(enableKerbMinder, "enableKerbMinder")
             my statusMenu's itemWithTitle_("Use KerbMinder")'s setState_(1)
+            tell defaults to setObject_forKey_(enableKerbMinder, "enableKerbMinder")
+            log "Enabled KerbMinder."
         end if
     end toggleKerbMinder_
 
@@ -1155,28 +1348,24 @@ Enable it now?" with icon 2 buttons {"No", "Yes"} default button 2)
         end if
     end toggleAllowPasswordChange_
 
-    -- Bound to Password Check Interval item in prefs window
-    on passwordCheckIntervalSet_(sender)
-        -- Set to integer value
-        set passwordCheckInterval to sender's intValue() as integer
-        -- Update plist
-        tell defaults to setObject_forKey_(passwordCheckInterval, "passwordCheckInterval")
-    end passwordCheckIntervalSet_
-
-
--- Bound to Revert button in Prefs window (REMOVE ON RELEASE)
+    -- Bound to Revert button in Prefs window
     on revertDefaults_(sender)
         tell defaults to removeObjectForKey_("menu_title")
+        tell defaults to removeObjectForKey_("first_run")
         tell defaults to removeObjectForKey_("tooltip")
         tell defaults to removeObjectForKey_("selectedMethod")
+        tell defaults to removeObjectForKey_("enableNotifications")
+        tell defaults to removeObjectForKey_("passwordCheckInterval")
         tell defaults to removeObjectForKey_("expireAge")
+        tell defaults to removeObjectForKey_("expireDateUnix")
         tell defaults to removeObjectForKey_("pwdSetDate")
         tell defaults to removeObjectForKey_("warningDays")
         tell defaults to removeObjectForKey_("prefsLocked")
         tell defaults to removeObjectForKey_("myLDAP")
         tell defaults to removeObjectForKey_("pwPolicy")
         tell defaults to removeObjectForKey_("pwPolicyButton")
-        tell defaults to removeObjectForKey_("mavAccTest")
+        tell defaults to removeObjectForKey_("accTest")
+        tell defaults to removeObjectForKey_("enableKerbMinder")
         tell defaults to removeObjectForKey_("enableKerbMinder")
         tell defaults to removeObjectForKey_("enableKeychainLockCheck")
         tell defaults to removeObjectForKey_("selectedBehaviour")
@@ -1200,22 +1389,23 @@ Please choose your configuration options."
     on createMenu_(sender)
         set statusMenu to (my NSMenu's alloc)'s initWithTitle_("statusMenu")
         statusMenu's setAutoenablesItems_(false)
-		set menuItem to (my NSMenuItem's alloc)'s init
-		menuItem's setTitle_("About ADPassMon…")
-		menuItem's setTarget_(me)
-		menuItem's setAction_("about:")
-		menuItem's setEnabled_(true)
-		statusMenu's addItem_(menuItem)
-		menuItem's release()
         
-		set menuItem to (my NSMenuItem's alloc)'s init
-        menuItem's setTitle_("Use Notifications")
-		menuItem's setTarget_(me)
-		menuItem's setAction_("toggleNotify:")
+        set menuItem to (my NSMenuItem's alloc)'s init
+        menuItem's setTitle_("About ADPassMon…")
+        menuItem's setTarget_(me)
+        menuItem's setAction_("about:")
         menuItem's setEnabled_(true)
-        menuItem's setState_(enableNotifications)
         statusMenu's addItem_(menuItem)
-		menuItem's release()
+        menuItem's release()
+
+        set menuItem to (my NSMenuItem's alloc)'s init
+        menuItem's setTitle_("Use Notifications")
+        menuItem's setTarget_(me)
+        menuItem's setAction_("toggleNotify:")
+        menuItem's setEnabled_(true)
+        menuItem's setState_(enableNotifications as integer)
+        statusMenu's addItem_(menuItem)
+        menuItem's release()
         
         set menuItem to (my NSMenuItem's alloc)'s init
         menuItem's setTitle_("Use KerbMinder")
@@ -1223,7 +1413,7 @@ Please choose your configuration options."
         menuItem's setAction_("toggleKerbMinder:")
         menuItem's setEnabled_(true)
         menuItem's setHidden_(not KerbMinderInstalled)
-        menuItem's setState_(enableKerbMinder)
+        menuItem's setState_(enableKerbMinder as integer)
         statusMenu's addItem_(menuItem)
         menuItem's release()
         
@@ -1235,75 +1425,81 @@ Please choose your configuration options."
         statusMenu's addItem_(menuItem)
         menuItem's release()
         
-		statusMenu's addItem_(my NSMenuItem's separatorItem)
+        statusMenu's addItem_(my NSMenuItem's separatorItem)
 		
-		set menuItem to (my NSMenuItem's alloc)'s init
-		menuItem's setTitle_("Refresh Kerberos Ticket")
-		menuItem's setTarget_(me)
-		menuItem's setAction_("doKerbCheck:")
-		menuItem's setEnabled_(not skipKerb)
-		statusMenu's addItem_(menuItem)
-		menuItem's release()
+        set menuItem to (my NSMenuItem's alloc)'s init
+        menuItem's setTitle_("Refresh Kerberos Ticket")
+        menuItem's setTarget_(me)
+        menuItem's setAction_("doKerbCheck:")
+        menuItem's setEnabled_(onDomain as boolean)
+        statusMenu's addItem_(menuItem)
+        menuItem's release()
         
-		set menuItem to (my NSMenuItem's alloc)'s init
-		menuItem's setTitle_("Launch Ticket Viewer")
-		menuItem's setTarget_(me)
-		menuItem's setAction_("ticketViewer:")
-		menuItem's setEnabled_(true)
-		statusMenu's addItem_(menuItem)
-		menuItem's release()
+        set menuItem to (my NSMenuItem's alloc)'s init
+        menuItem's setTitle_("Launch Ticket Viewer")
+        menuItem's setTarget_(me)
+        menuItem's setAction_("ticketViewer:")
+        menuItem's setEnabled_(true)
+        statusMenu's addItem_(menuItem)
+        menuItem's release()
         
-		set menuItem to (my NSMenuItem's alloc)'s init
-		menuItem's setTitle_("Re-check Expiration")
-		menuItem's setTarget_(me)
-		menuItem's setAction_("doProcess:")
-		menuItem's setEnabled_(true)
-		statusMenu's addItem_(menuItem)
-		menuItem's release()
+        set menuItem to (my NSMenuItem's alloc)'s init
+        menuItem's setTitle_("Re-check Expiration")
+        menuItem's setTarget_(me)
+        menuItem's setAction_("doProcess:")
+        menuItem's setEnabled_(true)
+        statusMenu's addItem_(menuItem)
+        menuItem's release()
+
+        set menuItem to (my NSMenuItem's alloc)'s init
+        menuItem's setTitle_("Change Password…")
+        menuItem's setTarget_(me)
+        menuItem's setAction_("changePassword:")
+        menuItem's setEnabled_(onDomain as boolean)
+        statusMenu's addItem_(menuItem)
+        menuItem's release()
         
-		set menuItem to (my NSMenuItem's alloc)'s init
-		menuItem's setTitle_("Change Password…")
-		menuItem's setTarget_(me)
-		menuItem's setAction_("changePassword:")
-		menuItem's setEnabled_(not skipKerb)
-		statusMenu's addItem_(menuItem)
-		menuItem's release()
-        
-		statusMenu's addItem_(my NSMenuItem's separatorItem)
+        statusMenu's addItem_(my NSMenuItem's separatorItem)
 		
-		set menuItem to (my NSMenuItem's alloc)'s init
-		menuItem's setTitle_("Exit")
-		menuItem's setTarget_(me)
-		menuItem's setAction_("quit:")
-		menuItem's setEnabled_(true)
-		statusMenu's addItem_(menuItem)
-		menuItem's release()
+        set menuItem to (my NSMenuItem's alloc)'s init
+        menuItem's setTitle_("Exit")
+        menuItem's setTarget_(me)
+        menuItem's setAction_("quit:")
+        menuItem's setEnabled_(true)
+        statusMenu's addItem_(menuItem)
+        menuItem's release()
         
-		-- Instantiate the statusItemController object and set it to use the statusMenu we just created
-		set statusMenuController to (current application's class "StatusMenuController"'s alloc)'s init
-		statusMenuController's createStatusItemWithMenu_(statusMenu)
-		statusMenu's release()
+        -- Instantiate the statusItemController object and set it to use the statusMenu we just created
+        set statusMenuController to (current application's class "StatusMenuController"'s alloc)'s init
+        statusMenuController's createStatusItemWithMenu_(statusMenu)
+        statusMenu's release()
     end createMenu_
     
     -- Do processes necessary for app initiation
-	on applicationWillFinishLaunching_(aNotification)
+    on applicationWillFinishLaunching_(aNotification)
         getOS_(me)
         regDefaults_(me) -- populate plist file with defaults (will not overwrite non-default settings))
         KerbMinderTest_(me)
         notifySetup_(me)
-        retrieveDefaults_(me)
-        -- Check for Selected Behaviour
-        doSelectedBehaviourCheck_(me)
-        createMenu_(me)
+        retrieveDefaults_(me) -- load defaults
+        doSelectedBehaviourCheck_(me) -- Check for Selected Behaviour
+        createMenu_(me)  -- build and display the status menu item
+        domainTest_(me)  -- test domain connectivity
+        if my onDomain is false then
+            return  -- stop the process if no domain connectivity
+        end if
         canPassExpire_(me)
         if passExpires then
-            if my expireAge = 0 and my selectedMethod = 0 then -- if we're using Auto and we don't have the password expiration age, check for kerberos ticket
+            -- if we're using Auto and we don't have the password expiration age, check for kerberos ticket
+            if my expireDateUnix = 0 and my selectedMethod = 0 then
                 doKerbCheck_(me)
-                if prefsLocked as integer is equal to 0 then -- only display the window if Prefs are not locked
-                    log "in the loop"
-                    theWindow's makeKeyAndOrderFront_(null) -- open the prefs window when running for first (assumption?) time
-                    set my theMessage to "Welcome!
-Please choose your configuration options."
+                if first_run then -- only display prefs window if running for first time
+                    if prefsLocked as integer is equal to 0 then -- only display the window if prefs are not locked
+                        log "First launch, waiting for settings..."
+                        theWindow's makeKeyAndOrderFront_(null)
+                        set my theMessage to "Welcome!\nPlease choose your configuration options."
+                        set first_run to false
+                    end if
                 end if
             else if my selectedMethod is 1 then
                 set my manualExpireDays to expireAge
@@ -1318,28 +1514,28 @@ Please choose your configuration options."
             end if
         
             watchForWake_(me)
+            
+            -- Set a timer to check for domain connectivity every five minutes. (300)
+            set domainTimer to NSTimer's scheduledTimerWithTimeInterval_target_selector_userInfo_repeats_(300, me, "intervalDomainTest:", missing value, true)
+            
+            log "About to set timer"
         
-			-- set password check interval to seconds
-			set passwordCheckIntervalInSeconds to (passwordCheckInterval * 3600)
-			log "  Password check interval set to every " & passwordCheckInterval & " hours..."
-		
-			-- Set a timer to trigger doProcess handler to hours specified by passwordCheckInterval and spawn notifications (if enabled).
-			NSTimer's scheduledTimerWithTimeInterval_target_selector_userInfo_repeats_(passwordCheckIntervalInSeconds, me, "doProcess:", missing value, true)
-        
+            -- Set a timer to trigger doProcess handler on an interval and spawn notifications (if enabled).
+            set processTimer to NSTimer's scheduledTimerWithTimeInterval_target_selector_userInfo_repeats_((my passwordCheckInterval * 3600), me, "intervalDoProcess:", missing value, true)
         else
-            log "Password does not exipire. Stopping."
+            log "Password does not expire. Stopping."
             updateMenuTitle_("[--]", "Your password does not expire.")
             set my theMessage to "Your password does not expire."
         end if
     end applicationWillFinishLaunching_
     
-	on applicationShouldTerminate_(sender)
-		return current application's NSTerminateNow
-	end applicationShouldTerminate_
+    on applicationShouldTerminate_(sender)
+        return current application's NSTerminateNow
+    end applicationShouldTerminate_
 
     -- This will immediately release the space in the menubar on quit
     on applicationWillTerminate_(notification)
         statusMenuController's releaseStatusItem()
-		statusMenuController's release()
+        statusMenuController's release()
     end applicationWillTerminate_
 end script

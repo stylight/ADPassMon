@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="6751" systemVersion="13F1077" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="7706" systemVersion="14F27" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="6751"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="7706"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="NSApplication">
@@ -15,18 +15,18 @@
         <window title="ADPassMon Preferences" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" restorable="NO" releasedWhenClosed="NO" showsToolbarButton="NO" visibleAtLaunch="NO" animationBehavior="default" id="371">
             <windowStyleMask key="styleMask" titled="YES" closable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES"/>
-            <rect key="contentRect" x="862" y="600" width="369" height="453"/>
+            <rect key="contentRect" x="862" y="600" width="369" height="429"/>
             <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1178"/>
             <view key="contentView" id="372">
-                <rect key="frame" x="0.0" y="-5" width="369" height="453"/>
+                <rect key="frame" x="0.0" y="-5" width="369" height="429"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <textField verticalHuggingPriority="750" id="754">
-                        <rect key="frame" x="20" y="390" width="329" height="43"/>
+                        <rect key="frame" x="20" y="366" width="329" height="43"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <textFieldCell key="cell" selectable="YES" allowsUndo="NO" sendsActionOnEndEditing="YES" borderStyle="bezel" alignment="center" title="Status" placeholderString="" drawsBackground="YES" id="755">
                             <font key="font" metaFont="system"/>
-                            <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                            <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" red="0.0" green="0.25098040700000002" blue="0.50196081400000003" alpha="0.14999999999999999" colorSpace="calibratedRGB"/>
                         </textFieldCell>
                         <connections>
@@ -34,54 +34,17 @@
                         </connections>
                     </textField>
                     <tabView id="933">
-                        <rect key="frame" x="13" y="10" width="343" height="378"/>
+                        <rect key="frame" x="13" y="10" width="343" height="354"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <font key="font" metaFont="system"/>
                         <tabViewItems>
                             <tabViewItem label="Settings" identifier="1" id="934">
                                 <view key="view" id="937">
-                                    <rect key="frame" x="10" y="33" width="323" height="332"/>
+                                    <rect key="frame" x="10" y="33" width="323" height="308"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
-                                        <matrix verticalHuggingPriority="750" tag="1" allowsEmptySelection="NO" id="agu-jS-UAM">
-                                            <rect key="frame" x="29" y="281" width="206" height="21"/>
-                                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                            <size key="cellSize" width="80" height="21"/>
-                                            <size key="intercellSpacing" width="46" height="2"/>
-                                            <buttonCell key="prototype" type="radio" title="Radio" imagePosition="left" alignment="left" tag="3" inset="2" id="4qd-BS-bJ9">
-                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="system"/>
-                                            </buttonCell>
-                                            <cells>
-                                                <column>
-                                                    <buttonCell type="radio" title="Version 1" imagePosition="left" scrollable="YES" lineBreakMode="clipping" state="on" toolTip="Get max password age from Active Directory" inset="2" id="v4N-hZ-XqP">
-                                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                        <font key="font" metaFont="system"/>
-                                                        <connections>
-                                                            <action selector="useBehaviour1:" target="494" id="719-Ci-2V3"/>
-                                                            <binding destination="494" name="value" keyPath="isBehaviour2Enabled" id="syo-PD-g4s">
-                                                                <dictionary key="options">
-                                                                    <string key="NSValueTransformerName">NSNegateBoolean</string>
-                                                                </dictionary>
-                                                            </binding>
-                                                        </connections>
-                                                    </buttonCell>
-                                                </column>
-                                                <column>
-                                                    <buttonCell type="radio" title="Version 2" imagePosition="left" scrollable="YES" lineBreakMode="clipping" toolTip="Manually enter maximum password age, in days" tag="1" inset="2" id="7K4-Vx-tob">
-                                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                        <font key="font" metaFont="system"/>
-                                                        <connections>
-                                                            <action selector="useBehaviour2:" target="494" id="jv2-PA-hpP"/>
-                                                            <binding destination="494" name="value" keyPath="isBehaviour2Enabled" id="4al-tF-VTs"/>
-                                                        </connections>
-                                                    </buttonCell>
-                                                </column>
-                                            </cells>
-                                        </matrix>
                                         <textField verticalHuggingPriority="750" id="938">
-                                            <rect key="frame" x="14" y="256" width="295" height="17"/>
+                                            <rect key="frame" x="16" y="239" width="295" height="17"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title="Maximum password age discovery method:" id="959">
                                                 <font key="font" metaFont="system"/>
@@ -90,10 +53,10 @@
                                             </textFieldCell>
                                         </textField>
                                         <matrix verticalHuggingPriority="750" allowsEmptySelection="NO" id="939">
-                                            <rect key="frame" x="29" y="228" width="222" height="18"/>
+                                            <rect key="frame" x="31" y="216" width="242" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                            <size key="cellSize" width="80" height="18"/>
+                                            <size key="cellSize" width="98" height="18"/>
                                             <size key="intercellSpacing" width="46" height="2"/>
                                             <buttonCell key="prototype" type="radio" title="Radio" imagePosition="left" alignment="left" tag="3" inset="2" id="958">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -101,7 +64,7 @@
                                             </buttonCell>
                                             <cells>
                                                 <column>
-                                                    <buttonCell type="radio" title="Auto:" imagePosition="left" scrollable="YES" lineBreakMode="clipping" state="on" toolTip="Get max password age from Active Directory" inset="2" id="957">
+                                                    <buttonCell type="radio" title="Automatic" imagePosition="left" scrollable="YES" lineBreakMode="clipping" state="on" toolTip="Get max password age from Active Directory" inset="2" id="957">
                                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                         <font key="font" metaFont="system"/>
                                                         <connections>
@@ -127,7 +90,7 @@
                                             </cells>
                                         </matrix>
                                         <textField toolTip="Enter maximum password age, in days" verticalHuggingPriority="750" id="941">
-                                            <rect key="frame" x="234" y="226" width="50" height="22"/>
+                                            <rect key="frame" x="258" y="214" width="50" height="22"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" enabled="NO" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" placeholderString="days" drawsBackground="YES" id="953">
                                                 <numberFormatter key="formatter" formatterBehavior="custom10_4" positiveFormat="#,##1.###" negativeFormat="#,##1.###" numberStyle="decimal" allowsFloats="NO" paddingCharacter="*" roundingMode="halfUp" minimumIntegerDigits="1" maximumIntegerDigits="3" maximumFractionDigits="3" decimalSeparator="." groupingSeparator="," currencyDecimalSeparator="." plusSign="+" minusSign="-" notANumberSymbol="NaN" perMillSymbol="‰" percentSymbol="%" exponentSymbol="E" positivePrefix="" positiveSuffix="" negativePrefix="-" negativeSuffix="" id="954">
@@ -150,7 +113,7 @@
                                             </connections>
                                         </textField>
                                         <button toolTip="Check this to start ADPassMon automatically on each login" id="942">
-                                            <rect key="frame" x="14" y="109" width="146" height="26"/>
+                                            <rect key="frame" x="15" y="105" width="146" height="26"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="check" title="Add to Login Items" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="952">
                                                 <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
@@ -160,28 +123,69 @@
                                                 <binding destination="706" name="value" keyPath="launchAtLogin" id="964"/>
                                             </connections>
                                         </button>
-                                        <button toolTip="Check this to start ADPassMon automatically on each login" id="Ege-2y-NmG">
-                                            <rect key="frame" x="14" y="84" width="274" height="26"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="check" title="Perform Keychain Lock check at launch?" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="Sxy-RK-GLQ">
-                                                <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="system"/>
-                                            </buttonCell>
-                                            <connections>
-                                                <action selector="toggleKeychainLockCheck:" target="494" id="m92-L1-6W1"/>
-                                                <binding destination="676" name="value" keyPath="values.enableKeychainLockCheck" id="ylf-l0-sFg"/>
-                                            </connections>
-                                        </button>
                                         <button toolTip="Select this to enable Growl notifications for upcoming password expiration " id="943">
-                                            <rect key="frame" x="14" y="199" width="128" height="18"/>
+                                            <rect key="frame" x="15" y="163" width="128" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="check" title="Use Notifications" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="951">
                                                 <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="system"/>
                                             </buttonCell>
                                             <connections>
-                                                <action selector="toggleNotify:" target="494" id="tVE-lK-mnz"/>
-                                                <binding destination="676" name="value" keyPath="values.enableNotifications" id="EYM-Xg-uNU">
+                                                <action selector="toggleNotify:" target="494" id="U20-fI-qYi"/>
+                                                <binding destination="676" name="value" keyPath="values.enableNotifications" id="MXG-Lu-E7u"/>
+                                            </connections>
+                                        </button>
+                                        <textField verticalHuggingPriority="750" id="944">
+                                            <rect key="frame" x="56" y="133" width="209" height="28"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <textFieldCell key="cell" controlSize="small" allowsUndo="NO" sendsActionOnEndEditing="YES" title="How many days before expiration do you want to be notified?" id="950">
+                                                <font key="font" metaFont="smallSystem"/>
+                                                <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                                <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                            </textFieldCell>
+                                        </textField>
+                                        <textField verticalHuggingPriority="750" id="l68-JV-PGI">
+                                            <rect key="frame" x="16" y="35" width="294" height="14"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <textFieldCell key="cell" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="center" title="Note: Press Enter after modifying values to apply changes" id="Nbq-Rb-Asb">
+                                                <font key="font" metaFont="smallSystem"/>
+                                                <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                                                <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                            </textFieldCell>
+                                        </textField>
+                                        <button verticalHuggingPriority="750" id="946">
+                                            <rect key="frame" x="107" y="-1" width="112" height="32"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <buttonCell key="cell" type="push" title="Test Settings" bezelStyle="rounded" alignment="center" state="on" borderStyle="border" inset="2" id="947">
+                                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                <font key="font" metaFont="system"/>
+                                            </buttonCell>
+                                            <connections>
+                                                <action selector="doKerbCheck:" target="494" id="974"/>
+                                            </connections>
+                                        </button>
+                                        <button toolTip="Check this to start ADPassMon automatically on each login" id="KXS-xg-TYi">
+                                            <rect key="frame" x="15" y="80" width="274" height="26"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <buttonCell key="cell" type="check" title="Perform Keychain Lock check at launch?" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="vCf-wp-dTT">
+                                                <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
+                                                <font key="font" metaFont="system"/>
+                                            </buttonCell>
+                                            <connections>
+                                                <action selector="toggleKeychainLockCheck:" target="494" id="jnV-yd-K3s"/>
+                                                <binding destination="676" name="value" keyPath="values.enableKeychainLockCheck" id="qHs-3B-v4X"/>
+                                            </connections>
+                                        </button>
+                                        <button id="mtz-QF-YuJ">
+                                            <rect key="frame" x="15" y="55" width="169" height="26"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <buttonCell key="cell" type="check" title="Allow password change?" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="nfr-Uu-NFT">
+                                                <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
+                                                <font key="font" metaFont="system"/>
+                                            </buttonCell>
+                                            <connections>
+                                                <action selector="toggleAllowPasswordChange:" target="494" id="zwm-If-KOd"/>
+                                                <binding destination="676" name="value" keyPath="values.allowPasswordChange" id="gKV-a8-tlm">
                                                     <dictionary key="options">
                                                         <bool key="NSAllowsEditingMultipleValuesSelection" value="NO"/>
                                                         <bool key="NSConditionallySetsEnabled" value="NO"/>
@@ -190,28 +194,90 @@
                                                 </binding>
                                             </connections>
                                         </button>
-                                        <textField verticalHuggingPriority="750" id="944">
-                                            <rect key="frame" x="40" y="143" width="188" height="51"/>
+                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="GtX-g5-UAC">
+                                            <rect key="frame" x="14" y="187" width="224" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <textFieldCell key="cell" allowsUndo="NO" sendsActionOnEndEditing="YES" title="How many days before your password expires do you want to be warned?" id="950">
+                                            <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title="Expiration check interval (in hours):" id="oUX-zk-vWp">
                                                 <font key="font" metaFont="system"/>
-                                                <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                                <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
                                         </textField>
-                                        <textField verticalHuggingPriority="750" id="0mZ-JB-71S">
-                                            <rect key="frame" x="14" y="310" width="295" height="17"/>
+                                        <textField verticalHuggingPriority="750" id="QZs-68-8lh">
+                                            <rect key="frame" x="257" y="185" width="50" height="22"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title="ADPassMon behaviour:" id="UtP-hn-mpj">
+                                            <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" state="on" borderStyle="bezel" alignment="left" placeholderString="hours" drawsBackground="YES" id="H0Z-4B-6om">
+                                                <numberFormatter key="formatter" formatterBehavior="default10_4" numberStyle="decimal" minimumIntegerDigits="1" maximumIntegerDigits="2000000000" maximumFractionDigits="3" id="81B-Ep-E3i">
+                                                    <real key="minimum" value="1"/>
+                                                    <metadata>
+                                                        <real key="inspectorSampleValue" value="0.5"/>
+                                                    </metadata>
+                                                </numberFormatter>
+                                                <font key="font" metaFont="system"/>
+                                                <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                            </textFieldCell>
+                                            <connections>
+                                                <action selector="passwordCheckIntervalCheck:" target="494" id="DcZ-EV-hOM"/>
+                                                <binding destination="494" name="value" keyPath="passwordCheckInterval" id="vlF-cO-MoS">
+                                                    <dictionary key="options">
+                                                        <bool key="NSConditionallySetsEditable" value="NO"/>
+                                                        <bool key="NSRaisesForNotApplicableKeys" value="NO"/>
+                                                        <bool key="NSValidatesImmediately" value="YES"/>
+                                                    </dictionary>
+                                                </binding>
+                                            </connections>
+                                        </textField>
+                                        <matrix verticalHuggingPriority="750" tag="1" allowsEmptySelection="NO" id="C9O-eq-WnL">
+                                            <rect key="frame" x="30" y="264" width="244" height="21"/>
+                                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                            <size key="cellSize" width="99" height="21"/>
+                                            <size key="intercellSpacing" width="46" height="2"/>
+                                            <buttonCell key="prototype" type="radio" title="Radio" imagePosition="left" alignment="left" tag="3" inset="2" id="hSL-cK-PAC">
+                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                <font key="font" metaFont="system"/>
+                                            </buttonCell>
+                                            <cells>
+                                                <column>
+                                                    <buttonCell type="radio" title="Version 1" imagePosition="left" scrollable="YES" lineBreakMode="clipping" state="on" toolTip="Get max password age from Active Directory" inset="2" id="9xj-xq-Pjx">
+                                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                        <font key="font" metaFont="system"/>
+                                                        <connections>
+                                                            <action selector="useBehaviour1:" target="494" id="FcC-EX-nMr"/>
+                                                            <binding destination="494" name="value" keyPath="isBehaviour2Enabled" id="Jk1-dT-Ivd">
+                                                                <dictionary key="options">
+                                                                    <string key="NSValueTransformerName">NSNegateBoolean</string>
+                                                                </dictionary>
+                                                            </binding>
+                                                        </connections>
+                                                    </buttonCell>
+                                                </column>
+                                                <column>
+                                                    <buttonCell type="radio" title="Version 2" imagePosition="left" scrollable="YES" lineBreakMode="clipping" toolTip="Manually enter maximum password age, in days" tag="1" inset="2" id="uvC-NT-Z0b">
+                                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                        <font key="font" metaFont="system"/>
+                                                        <connections>
+                                                            <action selector="useBehaviour2:" target="494" id="O1y-Ov-QFO"/>
+                                                            <binding destination="494" name="value" keyPath="isBehaviour2Enabled" id="CXj-pe-OXc"/>
+                                                        </connections>
+                                                    </buttonCell>
+                                                </column>
+                                            </cells>
+                                        </matrix>
+                                        <textField verticalHuggingPriority="750" id="K4Q-fr-kv7">
+                                            <rect key="frame" x="16" y="287" width="295" height="17"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title="ADPassMon behaviour:" id="kXu-rh-Ma9">
                                                 <font key="font" metaFont="system"/>
                                                 <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
                                         </textField>
                                         <textField verticalHuggingPriority="750" id="945">
-                                            <rect key="frame" x="233" y="157" width="50" height="22"/>
+                                            <rect key="frame" x="257" y="139" width="50" height="22"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" enabled="NO" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" placeholderString="days" drawsBackground="YES" id="948">
+                                            <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" enabled="NO" state="on" borderStyle="bezel" placeholderString="days" drawsBackground="YES" id="948">
                                                 <numberFormatter key="formatter" formatterBehavior="custom10_4" positiveFormat="#,##1.###" negativeFormat="#,##1.###" numberStyle="decimal" allowsFloats="NO" paddingCharacter="*" roundingMode="halfUp" minimumIntegerDigits="1" maximumIntegerDigits="3" maximumFractionDigits="3" decimalSeparator="." groupingSeparator="," currencyDecimalSeparator="." plusSign="+" minusSign="-" notANumberSymbol="NaN" perMillSymbol="‰" percentSymbol="%" exponentSymbol="E" positivePrefix="" positiveSuffix="" negativePrefix="-" negativeSuffix="" id="949">
                                                     <real key="multiplier" value="1"/>
                                                     <real key="roundingIncrement" value="1"/>
@@ -231,103 +297,25 @@
                                                 <binding destination="494" name="value" keyPath="warningDays" id="965"/>
                                             </connections>
                                         </textField>
-                                        <button id="vOM-es-dwA">
-                                            <rect key="frame" x="14" y="59" width="169" height="26"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="check" title="Allow password change?" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="8G9-lK-msF">
-                                                <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="system"/>
-                                            </buttonCell>
-                                            <connections>
-                                                <action selector="toggleAllowPasswordChange:" target="494" id="IUh-C7-bOS"/>
-                                                <binding destination="676" name="value" keyPath="values.allowPasswordChange" id="H3a-hS-4sm">
-                                                    <dictionary key="options">
-                                                        <bool key="NSAllowsEditingMultipleValuesSelection" value="NO"/>
-                                                        <bool key="NSConditionallySetsEnabled" value="NO"/>
-                                                        <bool key="NSRaisesForNotApplicableKeys" value="NO"/>
-                                                    </dictionary>
-                                                </binding>
-                                            </connections>
-                                        </button>
-                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="jlj-YR-fNr">
-                                            <rect key="frame" x="15" y="38" width="224" height="18"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title="Password Expiration Check Interval" id="s6e-Jv-4gf">
-                                                <font key="font" metaFont="system"/>
-                                                <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                                                <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                            </textFieldCell>
-                                        </textField>
-                                        <textField verticalHuggingPriority="750" id="5yI-kQ-ua8">
-                                            <rect key="frame" x="244" y="36" width="28" height="22"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" title="12" placeholderString="" drawsBackground="YES" id="8X7-MY-9ia">
-                                                <font key="font" metaFont="system"/>
-                                                <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
-                                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                            </textFieldCell>
-                                            <connections>
-                                                <action selector="passwordCheckIntervalSet:" target="494" id="HF3-D5-uQF"/>
-                                                <binding destination="494" name="value" keyPath="passwordCheckInterval" id="gId-uq-PvK">
-                                                    <dictionary key="options">
-                                                        <bool key="NSConditionallySetsEditable" value="NO"/>
-                                                        <bool key="NSValidatesImmediately" value="YES"/>
-                                                    </dictionary>
-                                                </binding>
-                                            </connections>
-                                        </textField>
-                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="UyS-UM-Iih">
-                                            <rect key="frame" x="278" y="39" width="40" height="17"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="hours" id="U6V-sK-5MH">
-                                                <font key="font" metaFont="system"/>
-                                                <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                                                <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                            </textFieldCell>
-                                        </textField>
-                                        <textField verticalHuggingPriority="750" id="940">
-                                            <rect key="frame" x="93" y="228" width="44" height="18"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" enabled="NO" allowsUndo="NO" sendsActionOnEndEditing="YES" state="on" placeholderString="" id="955">
-                                                <font key="font" metaFont="system"/>
-                                                <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
-                                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                            </textFieldCell>
-                                            <connections>
-                                                <binding destination="494" name="value" keyPath="expireAge" id="967"/>
-                                                <binding destination="494" name="hidden" keyPath="isManualEnabled" id="966"/>
-                                            </connections>
-                                        </textField>
-                                        <button verticalHuggingPriority="750" id="946">
-                                            <rect key="frame" x="94" y="-1" width="134" height="32"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="push" title="Apply Changes" bezelStyle="rounded" alignment="center" state="on" borderStyle="border" inset="2" id="947">
-                                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                <font key="font" metaFont="system"/>
-                                            </buttonCell>
-                                            <connections>
-                                                <action selector="doKerbCheck:" target="494" id="974"/>
-                                            </connections>
-                                        </button>
                                     </subviews>
                                 </view>
                             </tabViewItem>
                             <tabViewItem label="Reset" identifier="2" id="935">
                                 <view key="view" id="936">
-                                    <rect key="frame" x="10" y="33" width="323" height="332"/>
+                                    <rect key="frame" x="10" y="33" width="323" height="308"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <textField verticalHuggingPriority="750" id="977">
-                                            <rect key="frame" x="15" y="261" width="293" height="68"/>
+                                            <rect key="frame" x="15" y="196" width="293" height="51"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <textFieldCell key="cell" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="left" title="If you're having trouble with ADPassMon, you can remove your saved settings and revert to defaults by clicking this button." id="978">
+                                            <textFieldCell key="cell" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="left" title="If you're having trouble with ADPassMon, use this button to remove your saved settings and revert to defaults." id="978">
                                                 <font key="font" metaFont="system"/>
                                                 <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
                                         </textField>
                                         <button verticalHuggingPriority="750" id="600">
-                                            <rect key="frame" x="88" y="225" width="146" height="32"/>
+                                            <rect key="frame" x="88" y="143" width="146" height="32"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="push" title="Revert to Defaults" bezelStyle="rounded" alignment="center" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="601">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -344,33 +332,33 @@
                     </tabView>
                 </subviews>
             </view>
-            <point key="canvasLocation" x="334.5" y="407.5"/>
+            <point key="canvasLocation" x="348.5" y="398.5"/>
         </window>
         <customObject id="494" customClass="ADPassMonAppDelegate">
             <connections>
-                <outlet property="newPassword" destination="5lh-LE-8YE" id="j3r-9M-1Vk"/>
-                <outlet property="oldPassword" destination="YhO-84-M7C" id="FUX-Mq-eNV"/>
-                <outlet property="passwordPromptWindow" destination="0jF-gI-pv7" id="0Xt-aY-rz7"/>
+                <outlet property="newPassword" destination="LMV-OE-LlS" id="4QF-Vg-4SK"/>
+                <outlet property="oldPassword" destination="PxY-Ai-tfI" id="Jyt-eG-8qu"/>
+                <outlet property="passwordPromptWindow" destination="7RI-rj-ROH" id="tek-cj-mE4"/>
                 <outlet property="theWindow" destination="371" id="929"/>
-                <outlet property="verifyPassword" destination="1vd-Ed-20O" id="1tq-bz-f4v"/>
+                <outlet property="verifyPassword" destination="cMb-By-07v" id="lsc-7o-def"/>
             </connections>
         </customObject>
         <customObject id="420" customClass="NSFontManager"/>
         <userDefaultsController id="676"/>
         <customObject id="706" userLabel="Launch At Login Controller" customClass="LaunchAtLoginController"/>
         <userDefaultsController representsSharedInstance="YES" id="jdT-b8-uVY"/>
-        <window allowsToolTipsWhenApplicationIsInactive="NO" restorable="NO" releasedWhenClosed="NO" showsToolbarButton="NO" visibleAtLaunch="NO" animationBehavior="default" id="0jF-gI-pv7">
+        <window allowsToolTipsWhenApplicationIsInactive="NO" restorable="NO" releasedWhenClosed="NO" showsToolbarButton="NO" visibleAtLaunch="NO" animationBehavior="default" id="7RI-rj-ROH">
             <windowStyleMask key="styleMask" titled="YES" closable="YES"/>
             <rect key="contentRect" x="431" y="403" width="482" height="293"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1418"/>
-            <view key="contentView" wantsLayer="YES" id="xXE-se-5Si">
+            <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1417"/>
+            <view key="contentView" wantsLayer="YES" id="M7e-VX-EhU">
                 <rect key="frame" x="0.0" y="0.0" width="482" height="293"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
-                    <secureTextField verticalHuggingPriority="750" id="YhO-84-M7C">
+                    <secureTextField verticalHuggingPriority="750" id="PxY-Ai-tfI">
                         <rect key="frame" x="124" y="113" width="338" height="22"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                        <secureTextFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" drawsBackground="YES" usesSingleLineMode="YES" id="qdQ-Uu-RIu">
+                        <secureTextFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" drawsBackground="YES" usesSingleLineMode="YES" id="8ID-yI-bE9">
                             <font key="font" metaFont="system"/>
                             <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -379,19 +367,19 @@
                             </allowedInputSourceLocales>
                         </secureTextFieldCell>
                     </secureTextField>
-                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="ee1-j4-Dnt">
+                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="Ib9-mm-x3t">
                         <rect key="frame" x="22" y="116" width="93" height="17"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Old Password:" id="7U8-Aa-man">
+                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Old Password:" id="XOA-h1-Rt6">
                             <font key="font" metaFont="system"/>
                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
-                    <secureTextField verticalHuggingPriority="750" id="5lh-LE-8YE">
+                    <secureTextField verticalHuggingPriority="750" id="LMV-OE-LlS">
                         <rect key="frame" x="124" y="81" width="338" height="22"/>
                         <autoresizingMask key="autoresizingMask"/>
-                        <secureTextFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" drawsBackground="YES" usesSingleLineMode="YES" id="WB1-FD-gug">
+                        <secureTextFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" drawsBackground="YES" usesSingleLineMode="YES" id="LxJ-UZ-XpJ">
                             <font key="font" metaFont="system"/>
                             <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -400,19 +388,19 @@
                             </allowedInputSourceLocales>
                         </secureTextFieldCell>
                     </secureTextField>
-                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="Ppb-bb-MLF">
+                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="aPT-yE-K6R">
                         <rect key="frame" x="18" y="84" width="97" height="17"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="New Password:" id="M2U-gu-0QE">
+                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="New Password:" id="XYr-yE-6ZY">
                             <font key="font" metaFont="system"/>
                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
-                    <secureTextField verticalHuggingPriority="750" id="1vd-Ed-20O">
+                    <secureTextField verticalHuggingPriority="750" id="cMb-By-07v">
                         <rect key="frame" x="124" y="49" width="338" height="22"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                        <secureTextFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" drawsBackground="YES" usesSingleLineMode="YES" id="AM0-xq-lcf">
+                        <secureTextFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" drawsBackground="YES" usesSingleLineMode="YES" id="Evh-QX-PWD">
                             <font key="font" metaFont="system"/>
                             <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -421,19 +409,19 @@
                             </allowedInputSourceLocales>
                         </secureTextFieldCell>
                     </secureTextField>
-                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="jUv-2j-gsC">
+                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="xpy-jE-kfg">
                         <rect key="frame" x="10" y="52" width="107" height="17"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Verify Password:" id="u6z-nG-XLA">
+                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Verify Password:" id="OOI-0S-4HL">
                             <font key="font" metaFont="system"/>
                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
-                    <button verticalHuggingPriority="750" id="g7a-4N-Kt0">
+                    <button verticalHuggingPriority="750" id="nG5-qa-Qsy">
                         <rect key="frame" x="380" y="13" width="88" height="32"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                        <buttonCell key="cell" type="push" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="iRj-is-5LM">
+                        <buttonCell key="cell" type="push" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="RZ5-cA-fN8">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="system"/>
                             <string key="keyEquivalent" base64-UTF8="YES">
@@ -441,52 +429,47 @@ DQ
 </string>
                         </buttonCell>
                         <connections>
-                            <action selector="enteredPasswordCheck:" target="494" id="Kc0-Zk-H9L"/>
-                            <binding destination="494" name="title" keyPath="passwordPromptWindowButton1" id="ezm-Lr-BHz"/>
+                            <binding destination="494" name="title" keyPath="passwordPromptWindowButton1" id="By3-1l-udu"/>
                         </connections>
                     </button>
-                    <button hidden="YES" verticalHuggingPriority="750" id="mMm-Wh-neu">
+                    <button hidden="YES" verticalHuggingPriority="750" id="wbQ-5g-Put">
                         <rect key="frame" x="211" y="13" width="164" height="32"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                        <buttonCell key="cell" type="push" title="Create New Keychain" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="5iw-5F-1xk">
+                        <buttonCell key="cell" type="push" title="Create New Keychain" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="qRw-Nh-2LX">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="system"/>
                         </buttonCell>
                         <connections>
-                            <action selector="createNewKeychainButton:" target="494" id="MKS-Ze-cGG"/>
-                            <binding destination="494" name="hidden" keyPath="enablePasswordPromptWindowButton2" id="Xhb-qJ-weu">
-                                <dictionary key="options">
-                                    <string key="NSValueTransformerName">NSNegateBoolean</string>
-                                </dictionary>
-                            </binding>
+                            <action selector="createNewKeychain:" target="494" id="hHL-PN-zpe"/>
+                            <binding destination="494" name="hidden" keyPath="enablePasswordPromptWindowButton2" id="NTT-B3-oZR"/>
                         </connections>
                     </button>
-                    <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" id="eni-86-4FI">
-                        <rect key="frame" x="21" y="150" width="95" height="126"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                        <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" imageFrameStyle="grayBezel" image="icon" id="9IY-4O-l7Z"/>
-                    </imageView>
-                    <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" setsMaxLayoutWidthAtFirstLayout="YES" id="MVb-Td-Tdt">
+                    <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" setsMaxLayoutWidthAtFirstLayout="YES" id="vvO-pA-qrV">
                         <rect key="frame" x="122" y="143" width="342" height="130"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <textFieldCell key="cell" selectable="YES" allowsUndo="NO" sendsActionOnEndEditing="YES" title="Multiline Label" id="9m0-UX-pPB">
+                        <textFieldCell key="cell" selectable="YES" allowsUndo="NO" sendsActionOnEndEditing="YES" title="Multiline Label" id="lm9-au-iuR">
                             <font key="font" metaFont="system"/>
                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                         <connections>
-                            <binding destination="494" name="value" keyPath="passwordPromptWindowText" id="SJE-Ev-xAc"/>
+                            <binding destination="494" name="value" keyPath="passwordPromptWindowText" id="yfD-D2-fgn"/>
                         </connections>
                     </textField>
+                    <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" id="p2k-OO-HR4">
+                        <rect key="frame" x="17" y="151" width="99" height="125"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                        <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" imageFrameStyle="grayBezel" image="AppIcon" id="D7N-Az-Q90"/>
+                    </imageView>
                 </subviews>
             </view>
             <connections>
-                <binding destination="494" name="title" keyPath="passwordPromptWindowTitle" id="vG2-eK-2n2"/>
+                <binding destination="494" name="title" keyPath="passwordPromptWindowTitle" id="8NT-uM-e8i"/>
             </connections>
             <point key="canvasLocation" x="260" y="-63.5"/>
         </window>
     </objects>
     <resources>
-        <image name="icon" width="512" height="512"/>
+        <image name="AppIcon" width="512" height="512"/>
     </resources>
 </document>

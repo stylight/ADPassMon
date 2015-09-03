@@ -14,10 +14,11 @@
 		39094F361338DBE4007821C2 /* Credits.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 39094F341338DBE4007821C2 /* Credits.rtf */; };
 		39094F381338DBE4007821C2 /* ADPassMonAppDelegate.applescript in Sources */ = {isa = PBXBuildFile; fileRef = 39094F371338DBE4007821C2 /* ADPassMonAppDelegate.applescript */; };
 		39094F3B1338DBE4007821C2 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 39094F391338DBE4007821C2 /* MainMenu.xib */; };
-		3910E5881341116300E7EE50 /* icon.icns in Resources */ = {isa = PBXBuildFile; fileRef = 3910E5871341116300E7EE50 /* icon.icns */; };
-		391FC4F21361276900D2E33C /* README in Resources */ = {isa = PBXBuildFile; fileRef = 391FC4F11361276900D2E33C /* README */; };
+		391FC4F21361276900D2E33C /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 391FC4F11361276900D2E33C /* README.md */; };
 		39925B9F133CE6E8001C9566 /* LaunchAtLoginController.m in Sources */ = {isa = PBXBuildFile; fileRef = 39925B9E133CE6E8001C9566 /* LaunchAtLoginController.m */; };
 		39952F35133BAD5800A8DD42 /* StatusMenuController.m in Sources */ = {isa = PBXBuildFile; fileRef = 39952F34133BAD5800A8DD42 /* StatusMenuController.m */; };
+		39DC46FB1B6A6DF000AABB81 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 39DC46FA1B6A6DF000AABB81 /* Images.xcassets */; };
+		7C36C8481B9837C100D56827 /* AppIcon.icns in Resources */ = {isa = PBXBuildFile; fileRef = 7C36C8471B9837C100D56827 /* AppIcon.icns */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -46,12 +47,13 @@
 		39094F351338DBE4007821C2 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; name = en; path = en.lproj/Credits.rtf; sourceTree = "<group>"; };
 		39094F371338DBE4007821C2 /* ADPassMonAppDelegate.applescript */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.applescript; name = ADPassMonAppDelegate.applescript; path = ADPassMon/ADPassMonAppDelegate.applescript; sourceTree = "<group>"; };
 		39094F3A1338DBE4007821C2 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/MainMenu.xib; sourceTree = "<group>"; };
-		3910E5871341116300E7EE50 /* icon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = icon.icns; path = ../icon.icns; sourceTree = "<group>"; };
-		391FC4F11361276900D2E33C /* README */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = README; sourceTree = "<group>"; };
+		391FC4F11361276900D2E33C /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		39925B9D133CE6E8001C9566 /* LaunchAtLoginController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LaunchAtLoginController.h; sourceTree = "<group>"; };
 		39925B9E133CE6E8001C9566 /* LaunchAtLoginController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LaunchAtLoginController.m; sourceTree = "<group>"; };
 		39952F33133BAD5800A8DD42 /* StatusMenuController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StatusMenuController.h; sourceTree = "<group>"; };
 		39952F34133BAD5800A8DD42 /* StatusMenuController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = StatusMenuController.m; sourceTree = "<group>"; };
+		39DC46FA1B6A6DF000AABB81 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
+		7C36C8471B9837C100D56827 /* AppIcon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = AppIcon.icns; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -70,7 +72,7 @@
 		39094F141338DBE4007821C2 = {
 			isa = PBXGroup;
 			children = (
-				391FC4F11361276900D2E33C /* README */,
+				391FC4F11361276900D2E33C /* README.md */,
 				39F99903133A5F19002DAED5 /* Classes */,
 				39094F2B1338DBE4007821C2 /* ADPassMon */,
 				39094F221338DBE4007821C2 /* Frameworks */,
@@ -110,6 +112,7 @@
 			isa = PBXGroup;
 			children = (
 				39094F391338DBE4007821C2 /* MainMenu.xib */,
+				39DC46FA1B6A6DF000AABB81 /* Images.xcassets */,
 				39094F2C1338DBE4007821C2 /* Supporting Files */,
 			);
 			path = ADPassMon;
@@ -118,7 +121,7 @@
 		39094F2C1338DBE4007821C2 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
-				3910E5871341116300E7EE50 /* icon.icns */,
+				7C36C8471B9837C100D56827 /* AppIcon.icns */,
 				39094F2D1338DBE4007821C2 /* ADPassMon-Info.plist */,
 				39094F2E1338DBE4007821C2 /* InfoPlist.strings */,
 				39094F311338DBE4007821C2 /* ADPassMon-Prefix.pch */,
@@ -167,7 +170,7 @@
 		39094F161338DBE4007821C2 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0610;
+				LastUpgradeCheck = 0630;
 			};
 			buildConfigurationList = 39094F191338DBE4007821C2 /* Build configuration list for PBXProject "ADPassMon" */;
 			compatibilityVersion = "Xcode 3.2";
@@ -194,8 +197,9 @@
 				39094F301338DBE4007821C2 /* InfoPlist.strings in Resources */,
 				39094F361338DBE4007821C2 /* Credits.rtf in Resources */,
 				39094F3B1338DBE4007821C2 /* MainMenu.xib in Resources */,
-				3910E5881341116300E7EE50 /* icon.icns in Resources */,
-				391FC4F21361276900D2E33C /* README in Resources */,
+				7C36C8481B9837C100D56827 /* AppIcon.icns in Resources */,
+				39DC46FB1B6A6DF000AABB81 /* Images.xcassets in Resources */,
+				391FC4F21361276900D2E33C /* README.md in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -255,6 +259,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PREPROCESSOR_DEFINITIONS = DEBUG;
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
@@ -284,6 +289,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
@@ -303,7 +309,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				CODE_SIGN_IDENTITY = "";
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "Mac Developer";
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -317,7 +324,7 @@
 				GCC_PREFIX_HEADER = "ADPassMon/ADPassMon-Prefix.pch";
 				INFOPLIST_FILE = "ADPassMon/ADPassMon-Info.plist";
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
-				ONLY_ACTIVE_ARCH = NO;
+				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
 			};
@@ -327,7 +334,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				CODE_SIGN_IDENTITY = "";
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "Mac Developer";
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
@@ -341,7 +349,7 @@
 				GCC_PREFIX_HEADER = "ADPassMon/ADPassMon-Prefix.pch";
 				INFOPLIST_FILE = "ADPassMon/ADPassMon-Info.plist";
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
-				ONLY_ACTIVE_ARCH = NO;
+				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
 			};
