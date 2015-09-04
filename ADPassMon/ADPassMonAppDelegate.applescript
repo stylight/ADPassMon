@@ -63,7 +63,7 @@ script ADPassMonAppDelegate
     property changePasswordPromptWindowButton1 : "Change"
     property changePasswordPromptWindowText : "Please fill out all fields below.
     
-You need to be connected to your company's or institute's network to update your password, & to comply with any password policy set.
+You must be connected to your organization's network to update your password.
     
 Your login keychain will also be updated."
     property oldPassword : missing value
@@ -75,11 +75,11 @@ Your login keychain will also be updated."
     property checkKeychainLock : false
     property keychainState : missing value
     property isBehaviour2Enabled : missing value
-    property unlockKeychainPasswordWindowTitle : "Your Keychain is Locked!"
+    property unlockKeychainPasswordWindowTitle : "Your Keychain is locked!"
     property unlockKeychainPasswordWindowButton1 : "Update"
-    property unlockKeychainPasswordWindowText : "If you know the last password you used to login to the Mac, please fill out all the fields below & then click Update.
+    property unlockKeychainPasswordWindowText : "If you know the last password you used to login to the Mac, please complete all the fields below and click Update.
     
-    If you do not know the Keychain password, enter your new password in the new & verify fields. Then click 'Create New Keychain'"
+    If you do not know your keychain password, enter your new password in the New and Verify fields. Then click 'Create New Keychain'"
     property pwPolicyTest : missing value
     property pwPolicyString : missing value
 
@@ -1245,7 +1245,7 @@ Enable it now?" with icon 2 buttons {"No", "Yes"} default button 2)
         tell defaults to setObject:0 forKey:"isBehaviour2Enabled"
         -- Disable Keychain Policy options
         set my keychainPolicyEnabled to false
-        log "Behaviour 1 enabled..."
+        log "Native password method selected"
     end useBehaviour1_
 
     -- Bound to Version 2 radio button on the Prefs window
@@ -1256,7 +1256,7 @@ Enable it now?" with icon 2 buttons {"No", "Yes"} default button 2)
         tell defaults to setObject:1 forKey:"isBehaviour2Enabled"
         -- Enable Keychain Policy options
         set my keychainPolicyEnabled to true
-        log "Behaviour 2 enabled..."
+        log "ADPassMon password method selected"
     end useBehaviour2_
 
     -- Bound to warningDays box in Prefs window
@@ -1325,11 +1325,11 @@ Enable it now?" with icon 2 buttons {"No", "Yes"} default button 2)
         if my enableKeychainLockCheck is 1 then
             set my enableKeychainLockCheck to 0
             tell defaults to setObject_forKey_(0, "enableKeychainLockCheck")
-            log " Keychain Lock Check disabled..."
+            log "Keychain Lock Check disabled"
         else
             set my enableKeychainLockCheck to 1
             tell defaults to setObject_forKey_(1, "enableKeychainLockCheck")
-            log " Keychain Lock Check enabled..."
+            log " Keychain Lock Check enabled"
         end if
     end toggleKeychainLockCheck_
 
@@ -1340,11 +1340,11 @@ Enable it now?" with icon 2 buttons {"No", "Yes"} default button 2)
         if allowPasswordChange is true then
             set allowPasswordChange to false
             tell defaults to setObject_forKey_(allowPasswordChange, "allowPasswordChange")
-            log " Password change disabled..."
+            log "Password change disabled"
         else
             set allowPasswordChange to true
             tell defaults to setObject_forKey_(allowPasswordChange, "allowPasswordChange")
-            log " Password change enabled..."
+            log "Password change enabled"
         end if
     end toggleAllowPasswordChange_
 
