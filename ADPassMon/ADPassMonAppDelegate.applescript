@@ -356,10 +356,32 @@ Enable it now?" with icon 2 buttons {"No", "Yes"} default button 2)
     on notifySetup_(sender)
         if osVersion is less than 8 then
             set my enableNotifications to false
-        --else
-        --  set my enableNotifications to true
+        else
+            --set this app to handle notification responses
+            current application's NSUserNotificationCenter's defaultUserNotificationCenter's setDelegate_(me)
         end if
     end notifySetup_
+    
+    -- notifications should always be displayed (can be overridden in system Notification prefs)
+    on userNotificationCenter_shouldPresentNotification_(aCenter, aNotification)
+        return yes
+    end userNotificationCenter_shouldPresentNotification_
+    
+    -- handler for notification click events
+    on userNotificationCenter_didActivateNotification_(aCenter, aNotification)
+        -- 0 none
+        -- 1 contents clicked
+        -- 2 action button clicked
+        set userActivationType to (aNotification's activationType) as integer
+        if userActivationType is 1 then
+            -- do something if contents are clicked
+        else if userActivationType is 2 then
+            changePassword_(me)
+        else
+            -- catch all. nothign needed here.
+        end if
+        --return userActivationType
+    end userNotificationCenter_didActivateNotification_
 
     -- This handler is sent daysUntilExpNice and will trigger an alert if ≤ warningDays --NEEDED?
     on doNotify_(sender)
@@ -380,7 +402,9 @@ Enable it now?" with icon 2 buttons {"No", "Yes"} default button 2)
         set myNotification to current application's NSUserNotification's alloc()'s init()
         set myNotification's title to aTitle
         set myNotification's informativeText to aMessage
+        set myNotification's actionButtonTitle to "Change"
         current application's NSUserNotificationCenter's defaultUserNotificationCenter's deliverNotification_(myNotification)
+        --say "Your password will expire in " & daysUntilExpNice & " days." <-- OVERKILL?? :)
     end sendNotificationWithTitleAndMessage_
 
     -- Trigger doProcess handler on wake from sleep
