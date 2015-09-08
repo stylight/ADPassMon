@@ -397,7 +397,7 @@ Enable it now?" with icon 2 buttons {"No", "Yes"} default button 2)
         end if
     end doNotify_
 
-    -- Notifcation text
+    -- Notification text
     on sendNotificationWithTitleAndMessage_(aTitle, aMessage)
         set myNotification to current application's NSUserNotification's alloc()'s init()
         set myNotification's title to aTitle

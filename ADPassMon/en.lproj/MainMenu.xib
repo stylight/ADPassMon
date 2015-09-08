@@ -252,10 +252,10 @@
                                             </connections>
                                         </textField>
                                         <matrix verticalHuggingPriority="750" tag="1" id="dP0-TO-Peb">
-                                            <rect key="frame" x="29" y="122" width="284" height="21"/>
+                                            <rect key="frame" x="29" y="122" width="214" height="21"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                            <size key="cellSize" width="142" height="21"/>
+                                            <size key="cellSize" width="107" height="21"/>
                                             <size key="intercellSpacing" width="0.0" height="2"/>
                                             <buttonCell key="prototype" type="radio" title="Radio" imagePosition="left" alignment="left" enabled="NO" tag="3" inset="2" id="b8j-WS-2d8">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -266,7 +266,7 @@
                                             </buttonCell>
                                             <cells>
                                                 <column>
-                                                    <buttonCell type="radio" title="Native OS method" imagePosition="left" scrollable="YES" lineBreakMode="clipping" enabled="NO" state="on" toolTip="Use OS X's native password change method" inset="2" id="F4e-NZ-4w1">
+                                                    <buttonCell type="radio" title="Native OS" imagePosition="left" scrollable="YES" lineBreakMode="clipping" enabled="NO" state="on" toolTip="Use OS X's native password change method" inset="2" id="F4e-NZ-4w1">
                                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                         <font key="font" metaFont="system"/>
                                                         <connections>
@@ -280,7 +280,7 @@
                                                     </buttonCell>
                                                 </column>
                                                 <column>
-                                                    <buttonCell type="radio" title="ADPassMon method" imagePosition="left" scrollable="YES" lineBreakMode="clipping" enabled="NO" toolTip="Use ADPassMon's password change method" tag="1" inset="2" id="h5X-Ak-kkH">
+                                                    <buttonCell type="radio" title="ADPassMon" imagePosition="left" scrollable="YES" lineBreakMode="clipping" enabled="NO" toolTip="Use ADPassMon's password change method" tag="1" inset="2" id="h5X-Ak-kkH">
                                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                         <font key="font" metaFont="system"/>
                                                         <connections>
