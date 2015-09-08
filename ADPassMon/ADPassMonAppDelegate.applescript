@@ -699,14 +699,28 @@ Enable it now?" with icon 2 buttons {"No", "Yes"} default button 2)
     end easyMethod_
     
     on easyDate_(timestamp)
-        set my expirationDate to do shell script "/bin/date -r " & timestamp
+        set my expirationDate to do shell script "/bin/date -r" & timestamp
         set todayUnix to do shell script "/bin/date +%s"
         set my daysUntilExp to ((timestamp - todayUnix) / 86400)
         log "    daysUntilExp: " & daysUntilExp
         set my daysUntilExpNice to round daysUntilExp rounding toward zero
         --log "    daysUntilExpNice: " & daysUntilExpNice
     end easyDate_
-    
+
+    -- This is called when the domain is not accessible. It updates the menu display using data
+    -- from the plist, which we assume was updated the last time the domain was accessible.
+    on offlineUpdate_(sender)
+        try
+            tell defaults to set unixDate to objectForKey_("expireDateUnix") as integer
+            tell defaults to set tooltip to objectForKey_("tooltip") as string
+            set todayUnix to do shell script "/bin/date +%s"
+            set daysUntilExp to ((unixDate - todayUnix) / 86400)
+            set daysUntilExpNice to round daysUntilExp rounding toward zero
+            updateMenuTitle_((daysUntilExpNice as string) & "d", tooltip)
+        on error theError
+            errorOut_(theError, 1)
+        end try
+    end offlineUpdate_
 
     -- Calculate the number of days until password expiration
     on compareDates_(sender)
@@ -789,7 +803,8 @@ Enable it now?" with icon 2 buttons {"No", "Yes"} default button 2)
                 doNotify_(daysUntilExpNice)
             
             else
-                log " Stopping."
+                log "  Offline. Updating menu…"
+                offlineUpdate_(me)
             end if
         on error theError
             errorOut_(theError, 1)
@@ -1509,9 +1524,9 @@ Please choose your configuration options."
         doSelectedBehaviourCheck_(me) -- Check for Selected Behaviour
         createMenu_(me)  -- build and display the status menu item
         domainTest_(me)  -- test domain connectivity
-        if my onDomain is false then
-            return  -- stop the process if no domain connectivity
-        end if
+        --if my onDomain is false then
+        --    return  -- stop the process if no domain connectivity
+        --end if
         canPassExpire_(me)
         if passExpires then
             -- if we're using Auto and we don't have the password expiration age, check for kerberos ticket
@@ -1542,8 +1557,6 @@ Please choose your configuration options."
             -- Set a timer to check for domain connectivity every five minutes. (300)
             set domainTimer to NSTimer's scheduledTimerWithTimeInterval_target_selector_userInfo_repeats_(300, me, "intervalDomainTest:", missing value, true)
             
-            log "About to set timer"
-        
             -- Set a timer to trigger doProcess handler on an interval and spawn notifications (if enabled).
             set processTimer to NSTimer's scheduledTimerWithTimeInterval_target_selector_userInfo_repeats_((my passwordCheckInterval * 3600), me, "intervalDoProcess:", missing value, true)
         else
