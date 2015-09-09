@@ -426,6 +426,7 @@ DQ
 </string>
                         </buttonCell>
                         <connections>
+                            <action selector="enteredPasswordCheck:" target="494" id="aJ6-YF-Fwo"/>
                             <binding destination="494" name="title" keyPath="passwordPromptWindowButton1" id="By3-1l-udu"/>
                         </connections>
                     </button>
