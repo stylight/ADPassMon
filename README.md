@@ -9,7 +9,7 @@ ADPassMon is a small menu bar application that shows the number of days remainin
 * offline functionality via cached expiry information
 * MCX support for ease of administration
 
-This software is released under the [MIT license](https://yourmacguy.wordpress.com/adpassmon/#license).
+This software is released under the [MIT license](https://github.com/macmule/ADPassMon/wiki/License).
 
-You can read more about this project [here on the wiki](https://github.com/macmule/ADPassMon/wiki).
+You can read more about this project [on the wiki](https://github.com/macmule/ADPassMon/wiki).
 
