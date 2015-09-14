@@ -133,7 +133,7 @@ If you do not know your keychain password, enter your new password in the New an
     property daysUntilExpNice : ""
     property expirationDate :   ""
     property mavAccStatus :     ""
-    property passwordCheckInterval :    4  -- hours
+    property passwordCheckInterval : 4  -- hours
     property enableKeychainLockCheck : ""
     property selectedBehaviour : 1
     property keychainPolicy : ""
@@ -319,7 +319,6 @@ Enable it now?" with icon 2 buttons {"No", "Yes"} default button 2)
                                             pwPolicyURLButtonTitle:pwPolicyURLButtonTitle, ¬
                                             pwPolicyURLButtonURL:pwPolicyURLButtonURL, ¬
                                             pwPolicyURLButtonBrowser:pwPolicyURLButtonBrowser, ¬
-                                            passwordCheckInterval:passwordCheckInterval, ¬
                                             allowPasswordChange:allowPasswordChange })
     end regDefaults_
 
@@ -351,7 +350,6 @@ Enable it now?" with icon 2 buttons {"No", "Yes"} default button 2)
         tell defaults to set my pwPolicyURLButtonURL to objectForKey_("pwPolicyURLButtonURL")
         tell defaults to set my pwPolicyURLButtonBrowser to objectForKey_("pwPolicyURLButtonBrowser") as string
         tell defaults to set my allowPasswordChange to objectForKey_("allowPasswordChange")
-        tell defaults to set my passwordCheckInterval to objectForKey_ ("passwordCheckInterval") as integer
     end retrieveDefaults_
 
     -- Disable notifications if running < 10.8
@@ -1308,29 +1306,26 @@ Enable it now?" with icon 2 buttons {"No", "Yes"} default button 2)
     end setWarningDays_
 
     -- Bound to passwordCheckInterval box in Prefs window
-    on passwordCheckIntervalCheck_(sender)
+    on setPasswordCheckInterval_(sender)
         set my passwordCheckInterval to sender's intValue() as integer
-        -- If we have a value
-        if my passwordCheckInterval is not equal to missing value
-            -- Set to integer of value
-            set passwordCheckInterval to passwordCheckInterval as integer
-            -- Move to timer function
-            setpasswordCheckInterval_(me)
-        end if
-    end passwordCheckIntervalCheck_
+        tell defaults to setObject_forKey_(passwordCheckInterval, "passwordCheckInterval")
+        set unit to " hours"
+        if my passwordCheckInterval is equal to 1 then set unit to " hour"
+        log "Set check interval to " & passwordCheckInterval & unit
+        -- reset the timer
+        resetIntervalTimer_(me)
+    end setPasswordCheckInterval_
 
     -- Timer function
-    on setpasswordCheckInterval_(sender)
-        processTimer's invalidate() -- kills the existing timer
-        tell defaults to setObject_forKey_(passwordCheckInterval, "passwordCheckInterval")
+    on resetIntervalTimer_(sender)
+        my processTimer's invalidate() -- kills the existing timer
         -- start a timer with the new interval
-        set processTimer to current application's NSTimer's scheduledTimerWithTimeInterval_target_selector_userInfo_repeats_((my passwordCheckInterval * 3600), me, "intervalDoProcess:", missing value, true)
-        set unit to " hours"
-        if passwordCheckInterval is equal to 1 then
-            set unit to " hour"
-        end if
-        log "Set check interval to " & passwordCheckInterval & unit
-    end setpasswordCheckInterval_
+        try
+            set my processTimer to current application's NSTimer's scheduledTimerWithTimeInterval_target_selector_userInfo_repeats_((my passwordCheckInterval as integer * 3600), me, "intervalDoProcess:", missing value, true)
+        on error theError
+            log theError
+        end try
+    end resetIntervalTimer_
 
     -- Bound to Notify items in menu and Prefs window
     on toggleNotify_(sender)
@@ -1558,10 +1553,10 @@ Please choose your configuration options."
             watchForWake_(me)
             
             -- Set a timer to check for domain connectivity every five minutes. (300)
-            set domainTimer to NSTimer's scheduledTimerWithTimeInterval_target_selector_userInfo_repeats_(300, me, "intervalDomainTest:", missing value, true)
+            set my domainTimer to NSTimer's scheduledTimerWithTimeInterval_target_selector_userInfo_repeats_(300, me, "intervalDomainTest:", missing value, true)
             
             -- Set a timer to trigger doProcess handler on an interval and spawn notifications (if enabled).
-            set processTimer to NSTimer's scheduledTimerWithTimeInterval_target_selector_userInfo_repeats_((my passwordCheckInterval * 3600), me, "intervalDoProcess:", missing value, true)
+            set my processTimer to NSTimer's scheduledTimerWithTimeInterval_target_selector_userInfo_repeats_((my passwordCheckInterval * 3600), me, "intervalDoProcess:", missing value, true)
         else
             log "Password does not expire. Stopping."
             updateMenuTitle_("[--]", "Your password does not expire.")
