@@ -79,7 +79,7 @@ Your login keychain will also be updated."
     property unlockKeychainPasswordWindowButton1 : "Update"
     property unlockKeychainPasswordWindowText : "If you know the last password you used to login to the Mac, please complete all the fields below and click Update.
     
-    If you do not know your keychain password, enter your new password in the New and Verify fields. Then click 'Create New Keychain'"
+If you do not know your keychain password, enter your new password in the New and Verify fields, then click 'Create New Keychain'."
     property pwPolicyTest : missing value
     property pwPolicyString : missing value
 
@@ -140,7 +140,7 @@ Your login keychain will also be updated."
     property pwPolicyURLButtonTitle : ""
     property pwPolicyURLButtonURL : ""
     property pwPolicyURLButtonBrowser : ""
-    property keychainPolicyText : ""
+    --property keychainPolicyText : ""
 
 --- HANDLERS ---
 
@@ -273,7 +273,7 @@ Enable it now?" with icon 2 buttons {"No", "Yes"} default button 2)
                 log "  Keychain locked..."
                 closeKeychainAccess_(me)
             end if
-            else
+        else
             log "  Skipping Keychain Lock state check..."
         end if
     end doKeychainLockCheck_
@@ -314,6 +314,7 @@ Enable it now?" with icon 2 buttons {"No", "Yes"} default button 2)
                                             enableKeychainLockCheck:0, ¬
                                             selectedBehaviour:1, ¬
                                             isBehaviour2Enabled:0, ¬
+                                            keychainPolicy:keychainPolicy, ¬
                                             changePasswordPromptWindowTitle:changePasswordPromptWindowTitle, ¬
                                             pwPolicyURLButtonTitle:pwPolicyURLButtonTitle, ¬
                                             pwPolicyURLButtonURL:pwPolicyURLButtonURL, ¬
@@ -344,6 +345,7 @@ Enable it now?" with icon 2 buttons {"No", "Yes"} default button 2)
         tell defaults to set my enableKeychainLockCheck to objectForKey_("enableKeychainLockCheck") as integer
         tell defaults to set my selectedBehaviour to objectForKey_ ("selectedBehaviour") as integer
         tell defaults to set my isBehaviour2Enabled to objectForKey_("isBehaviour2Enabled") as integer
+        tell defaults to set my keychainPolicy to objectForKey_("keychainPolicy") as string
         tell defaults to set my changePasswordPromptWindowTitle to objectForKey_("changePasswordPromptWindowTitle")
         tell defaults to set my pwPolicyURLButtonTitle to objectForKey_("pwPolicyURLButtonTitle")
         tell defaults to set my pwPolicyURLButtonURL to objectForKey_("pwPolicyURLButtonURL")
@@ -888,7 +890,7 @@ Enable it now?" with icon 2 buttons {"No", "Yes"} default button 2)
         tell application "System Events"
             set ProcessList to name of every process
             if "Keychain Access" is in ProcessList then
-                display dialog "Keychain Access needs to be closed to proceed" with icon 2 buttons {"Cancel", "Close Keychain Access"} default button "Close Keychain Access"
+                display dialog "Keychain Access needs to be closed to proceed." with icon 2 buttons {"Cancel", "Close Keychain Access"} default button 2
                 if button returned of the result is "Close Keychain Access" then
                     set ThePID to unix id of process "Keychain Access"
                     do shell script "kill -KILL " & ThePID
@@ -903,9 +905,9 @@ Enable it now?" with icon 2 buttons {"No", "Yes"} default button 2)
     on keychainPasswordPrompt_(sender)
         -- Show keychain policy if set
         tell defaults to set my keychainPolicy to objectForKey_("keychainPolicy") as string
-        if my keychainPolicy is not "" then
+        if keychainPolicy is not equal to "" then
             tell application "System Events"
-                display dialog keychainPolicy with icon 2 buttons {"OK"}
+                display dialog keychainPolicy with icon 2 buttons {"OK"} default button 1
             end tell
         end if
         -- If the password prompt window is not set to change, then display Keychain unlock details.
@@ -1409,6 +1411,7 @@ Enable it now?" with icon 2 buttons {"No", "Yes"} default button 2)
         tell defaults to removeObjectForKey_("enableKeychainLockCheck")
         tell defaults to removeObjectForKey_("selectedBehaviour")
         tell defaults to removeObjectForKey_("isBehaviour2Enabled")
+        tell defaults to removeObjectForKey_("keychainPolicy")
         tell defaults to removeObjectForKey_("changePasswordPromptWindowTitle")
         tell defaults to removeObjectForKey_("pwPolicyURLButtonTitle")
         tell defaults to removeObjectForKey_("pwPolicyURLButtonURL")
