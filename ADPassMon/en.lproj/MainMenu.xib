@@ -210,7 +210,7 @@
                                                 <numberFormatter key="formatter" formatterBehavior="default10_4" numberStyle="decimal" minimumIntegerDigits="1" maximumIntegerDigits="2000000000" maximumFractionDigits="3" id="1ot-bq-FnG">
                                                     <real key="minimum" value="1"/>
                                                     <metadata>
-                                                        <real key="inspectorSampleValue" value="0.5"/>
+                                                        <real key="inspectorSampleValue" value="2"/>
                                                     </metadata>
                                                 </numberFormatter>
                                                 <font key="font" metaFont="system"/>
@@ -218,14 +218,8 @@
                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
                                             <connections>
-                                                <action selector="passwordCheckIntervalCheck:" target="494" id="Hp8-Ek-JAa"/>
-                                                <binding destination="494" name="value" keyPath="passwordCheckInterval" id="0YM-Ff-hD2">
-                                                    <dictionary key="options">
-                                                        <bool key="NSConditionallySetsEditable" value="NO"/>
-                                                        <bool key="NSRaisesForNotApplicableKeys" value="NO"/>
-                                                        <bool key="NSValidatesImmediately" value="YES"/>
-                                                    </dictionary>
-                                                </binding>
+                                                <action selector="setPasswordCheckInterval:" target="494" id="4R0-8R-JJR"/>
+                                                <binding destination="494" name="value" keyPath="passwordCheckInterval" id="axh-Yp-3Hv"/>
                                             </connections>
                                         </textField>
                                         <textField verticalHuggingPriority="750" id="LRy-g9-pwg">
@@ -248,7 +242,7 @@
                                             <connections>
                                                 <action selector="setWarningDays:" target="494" id="7JE-DY-v74"/>
                                                 <binding destination="494" name="enabled" keyPath="enableNotifications" id="94g-Tn-9kn"/>
-                                                <binding destination="494" name="value" keyPath="warningDays" id="8Ar-rB-7MP"/>
+                                                <binding destination="494" name="value" keyPath="warningDays" id="19Y-Wl-1SA"/>
                                             </connections>
                                         </textField>
                                         <matrix verticalHuggingPriority="750" tag="1" id="dP0-TO-Peb">
