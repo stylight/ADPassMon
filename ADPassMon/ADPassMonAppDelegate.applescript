@@ -24,10 +24,6 @@
 --  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 --  THE SOFTWARE.
 ---------------------------------------------------------------------------------
--- TO DO:
---
--- FEATURE REQUESTS:
--- - Enable mcx defaults hook for adding as login item.
 
 script ADPassMonAppDelegate
 
@@ -61,7 +57,7 @@ script ADPassMonAppDelegate
     property passwordPromptWindowButton1 : missing value
     property changePasswordPromptWindowTitle : "Change Password"
     property changePasswordPromptWindowButton1 : "Change"
-    property changePasswordPromptWindowText : "Please fill out all fields below.
+    property changePasswordPromptWindowText : "Please complete all the fields below.
     
 You must be connected to your organization's network to update your password.
     
@@ -140,7 +136,6 @@ If you do not know your keychain password, enter your new password in the New an
     property pwPolicyURLButtonTitle : ""
     property pwPolicyURLButtonURL : ""
     property pwPolicyURLButtonBrowser : ""
-    --property keychainPolicyText : ""
 
 --- HANDLERS ---
 
@@ -191,7 +186,7 @@ If you do not know your keychain password, enter your new password in the New an
                     if "80" is in (do shell script "/usr/bin/id -G") then -- checks if user is in admin group
                         set accessDialog to (display dialog "ADPassMon's \"Change Password\" feature requires assistive access to open the password panel.
                         
-    Enable it now? (requires password)" with icon 2 buttons {"No", "Yes"} default button 2)
+    Enable it now? (requires password)" with icon 2 buttons {"No","Yes"} default button 2)
                         if button returned of accessDialog is "Yes" then
                             log "  Prompting for password"
                             try
@@ -232,7 +227,7 @@ If you do not know your keychain password, enter your new password in the New an
             activate
             set response to (display dialog "ADPassMon's \"Change Password\" feature requires assistive access to open the password panel.
             
-Enable it now?" with icon 2 buttons {"No", "Yes"} default button 2)
+Enable it now?" with icon 2 buttons {"No","Yes"} default button 2)
             if button returned of response is "Yes" then
                 log "  Prompting for password"
                 try
@@ -241,7 +236,6 @@ Enable it now?" with icon 2 buttons {"No", "Yes"} default button 2)
                         set UI elements enabled to true
                     end tell
                     log "  Now enabled"
-                    --display dialog "Access for assistive devices is now enabled." buttons {"OK"} default button 1
                 on error theError
                     log "  Error: " & theError
                     activate
@@ -357,7 +351,7 @@ Enable it now?" with icon 2 buttons {"No", "Yes"} default button 2)
         if osVersion is less than 8 then
             set my enableNotifications to false
         else
-            --set this app to handle notification responses
+            -- set this app to handle notification responses
             current application's NSUserNotificationCenter's defaultUserNotificationCenter's setDelegate_(me)
         end if
     end notifySetup_
@@ -369,21 +363,18 @@ Enable it now?" with icon 2 buttons {"No", "Yes"} default button 2)
     
     -- handler for notification click events
     on userNotificationCenter_didActivateNotification_(aCenter, aNotification)
+        set userActivationType to (aNotification's activationType) as integer
         -- 0 none
         -- 1 contents clicked
         -- 2 action button clicked
-        set userActivationType to (aNotification's activationType) as integer
         if userActivationType is 1 then
-            -- do something if contents are clicked
+            -- do something if contents are clicked. We're currently ignoring this.
         else if userActivationType is 2 then
             changePassword_(me)
-        else
-            -- catch all. nothign needed here.
         end if
-        --return userActivationType
     end userNotificationCenter_didActivateNotification_
 
-    -- This handler is sent daysUntilExpNice and will trigger an alert if ≤ warningDays --NEEDED?
+    -- This handler is sent daysUntilExpNice and will trigger an alert if ≤ warningDays
     on doNotify_(sender)
         if sender as integer ≤ my warningDays as integer then
             if osVersion is greater than 7 then
@@ -404,7 +395,6 @@ Enable it now?" with icon 2 buttons {"No", "Yes"} default button 2)
         set myNotification's informativeText to aMessage
         set myNotification's actionButtonTitle to "Change"
         current application's NSUserNotificationCenter's defaultUserNotificationCenter's deliverNotification_(myNotification)
-        --say "Your password will expire in " & daysUntilExpNice & " days." <-- OVERKILL?? :)
     end sendNotificationWithTitleAndMessage_
 
     -- Trigger doProcess handler on wake from sleep
@@ -435,7 +425,7 @@ Enable it now?" with icon 2 buttons {"No", "Yes"} default button 2)
             my statusMenu's itemWithTitle_("Refresh Kerberos Ticket")'s setEnabled_(1)
             -- Set variable to boolean
             set allowPasswordChange to allowPasswordChange as boolean
-            -- If password change is  allowed, show
+            -- If password change is allowed, show
             if allowPasswordChange is true then
                 my statusMenu's itemWithTitle_("Change Password…")'s setEnabled_(1)
             -- If password change is not allowed, but a password policy is set, show (as this will show policy).
@@ -473,36 +463,11 @@ Enable it now?" with icon 2 buttons {"No", "Yes"} default button 2)
         end try
     end canPassExpire_
 
-    -- Checks for kerberos ticket, necessary for auto method. Also bound to Refresh Kerb menu item.
+    -- Checks for domain connectivity before checking for ticket. Also bound to Refresh Kerb menu item.
     on doKerbCheck_(sender)
         if my onDomain is true and my skipKerb is false then
             if selectedMethod = 0 then
-                if osVersion is less than 7 then
-                    try
-                        log "Testing for kerberos ticket presence…"
-                        set kerb to do shell script "/usr/bin/klist -t"
-                        set renewKerb to do shell script "/usr/bin/kinit -R"
-                        log "  Ticket found and renewed"
-                        set my isIdle to true
-                        retrieveDefaults_(me)
-                        doProcess_(me)
-                    on error theError
-                        set my theMessage to "Kerberos ticket expired or not found"
-                        log "  No ticket found"
-                        activate
-                        set response to (display dialog "No Kerberos ticket for Active Directory was found. Do you want to renew it?" with icon 1 buttons {"No","Yes"} default button "Yes")
-                        if button returned of response is "Yes" then
-                            do shell script "/bin/echo '' | /usr/bin/kinit -l 24h -r 24h &" -- Displays a password dialog in 10.6 (and maybe 10.5?)
-                            log "  Ticket acquired"
-                            doKerbCheck_(me) -- Rerun the handler to verify kerb ticket and call doProcess
-                        else -- if No is clicked
-                            log "  User chose not to acquire"
-                            errorOut_(theError, 1)
-                        end if
-                    end try
-                else -- if osVersion is 7 or greater
-                    doLionKerb_(me)
-                end if
+                doLionKerb_(me)
             else -- if selectedMethod = 1
                 doProcess_(me)
             end if
@@ -514,7 +479,7 @@ Enable it now?" with icon 2 buttons {"No", "Yes"} default button 2)
     -- Need to handle Lion's kerberos differently from older OSes
     on doLionKerb_(sender)
         try
-            log "Testing for Kerberos ticket presence…"
+            log "Testing for Kerberos ticket…"
             set kerb to do shell script "/usr/bin/klist -t"
             set renewKerb to do shell script "/usr/bin/kinit -R"
             log "  Ticket found and renewed"
@@ -525,7 +490,7 @@ Enable it now?" with icon 2 buttons {"No", "Yes"} default button 2)
             set my theMessage to "Kerberos ticket expired or not found"
             log "  No ticket found"
             activate
-            set response to (display dialog "No Kerberos ticket for Active Directory was found. Do you want to renew it?" with icon 2 buttons {"No","Yes"} default button "Yes")
+            set response to (display dialog "No Kerberos ticket for Active Directory was found. Do you want to renew it?" with icon 2 buttons {"No","Yes"} default button 2)
             if button returned of response is "Yes" then
                 renewLionKerb_(me)
             else -- if No is clicked
@@ -888,7 +853,7 @@ Enable it now?" with icon 2 buttons {"No", "Yes"} default button 2)
         tell application "System Events"
             set ProcessList to name of every process
             if "Keychain Access" is in ProcessList then
-                display dialog "Keychain Access needs to be closed to proceed." with icon 2 buttons {"Cancel", "Close Keychain Access"} default button 2
+                display dialog "Keychain Access needs to be closed to proceed." with icon 2 buttons {"Cancel","Close Keychain Access"} default button 2
                 if button returned of the result is "Close Keychain Access" then
                     set ThePID to unix id of process "Keychain Access"
                     do shell script "kill -KILL " & ThePID
@@ -929,7 +894,7 @@ Enable it now?" with icon 2 buttons {"No", "Yes"} default button 2)
         if my passwordPromptWindowButton1 is equal to "Change"
             if enteredOldPassword is equal to "" or enteredNewPassword is equal to "" or enteredVerifyPassword is equal to "" then
                 tell application "System Events"
-                    display dialog "Please fill out all password fields." with icon 2 buttons {"OK"} default button "OK"
+                    display dialog "Please fill out all password fields." with icon 2 buttons {"OK"} default button 1
                 end tell
                 changePassword_(me)
                 set firstPasswordCheckPassed to false
@@ -937,7 +902,7 @@ Enable it now?" with icon 2 buttons {"No", "Yes"} default button 2)
         else
             if enteredNewPassword is equal to "" or enteredVerifyPassword is equal to "" then
                 tell application "System Events"
-                    display dialog "Please fill out both the New & Verify password fields" with icon 2 buttons {"OK"} default button "OK"
+                    display dialog "Please fill out both the New & Verify password fields" with icon 2 buttons {"OK"} default button 1
                 end tell
                 keychainPasswordPrompt_(me)
                 set firstPasswordCheckPassed to false
@@ -948,7 +913,7 @@ Enable it now?" with icon 2 buttons {"No", "Yes"} default button 2)
             -- Check that the new & verify passwords are the same, prompt if not. Then return to password prompt window.
             if my enteredNewPassword does not equal enteredVerifyPassword
                 tell application "System Events"
-                    display dialog "Your New & Verified passwords did not match. Please try again." with icon 2 buttons {"OK"} default button "OK"
+                    display dialog "Your New & Verified passwords did not match. Please try again." with icon 2 buttons {"OK"} default button 1
                 end tell
                 -- If fails, go back to handler that called this handler
                 if my passwordPromptWindowButton1 is equal to "Change"
@@ -993,24 +958,24 @@ Enable it now?" with icon 2 buttons {"No", "Yes"} default button 2)
             -- Set Keychain settings to make sure they are unlocked
             setKeychainSettings_(me)
             on error errStr
-                -- Errors if not connected to company/institutes network
+                -- Errors if not connected to org's network
                 if errStr contains "eDSServiceUnavailable" then
-                    log "Password change failed. Please verify that you are connected to your companies/institutes network & try again"
-                    display dialog "Password change failed. Please verify that you are connected to your company's/institute's network & try again" with icon 2 buttons {"OK"} default button "OK"
+                    log "Password change failed. Not connected?"
+                    display dialog "Password change failed. Please verify that you are connected to your organization's network and try again." with icon 2 buttons {"OK"} default button 1
                     if button returned of the result is "OK" then
                         changePassword_(me)
                     end if
                 -- Errors if password change fails due to old pass being wrong or new pass not meeting password policy requirements
                 else if errStr contains "eDSAuthMethodNotSupported" then
-                    log "Password change failed. Please verify that you have entered the correct password in the Old Password field & that your New Password meets your company's/institute's password policy"
-                    display dialog "Password change failed. Please verify that you have entered the correct password in the Old Password field & that your New Password meets your company's/institute's password policy" with icon 2 buttons {"OK"} default button "OK"
+                    log "Password change failed. Incorrect or doesn't meet policy."
+                    display dialog "Password change failed. Please verify that you have entered the correct password in the Old Password field and that your New Password meets your organization's password policy." with icon 2 buttons {"OK"} default button 1
                     if button returned of the result is "OK" then
                         changePassword_(me)
                     end if
                 -- Oops, not sure what happened.. :(
                 else
-                    log "Password change failed. Please try again."
-                    display dialog "Password change failed. Please try again." with icon 2 buttons {"OK"} default button "OK"
+                    log "Password change failed."
+                    display dialog "Password change failed. Please try again." with icon 2 buttons {"OK"} default button 1
                     if button returned of the result is "OK" then
                         changePassword_(me)
                     end if
@@ -1024,26 +989,26 @@ Enable it now?" with icon 2 buttons {"No", "Yes"} default button 2)
         if userPasswordChanged is equal to true
         try
             -- Log Action
-            log "Attempting Keychain unlock.."
+            log "Attempting Keychain unlock…"
             -- Unlock the keychain
             do shell script "security unlock-keychain -p " & quoted form of enteredOldPassword & " ~/Library/Keychains/login.keychain"
             -- Make sure that the Keychains password is set to what the new password
-            log "Attempting keychain password update.."
+            log "Attempting keychain password update…"
             -- Set keychain password
             do shell script "security set-keychain-password -o " & quoted form of enteredOldPassword & " -p " & quoted form of enteredNewPassword & " ~/Library/Keychains/login.keychain"
             -- Log Action
-            log "Keychain successfully updated!"
+            log "Keychain updated."
             -- Close the password prompt window
             closePasswordPromptWindow_(me)
             -- Advise the user that it's worked
-            display dialog "Update successful!" with icon 1 buttons ("OK") default button {"OK"}
+            display dialog "Update successful!" with icon 1 buttons {"OK"} default button 1
             -- Set to front window
             tell application "System Events" to set frontmost of process "ADPassMon" to true
         on error
             -- Log Action
-            log "Keychain update failed!"
+            log "Keychain update failed."
             -- Display dialog to user
-            display dialog "Keychain update failed. Please try again" with icon 2 buttons {"OK"} default button "OK"
+            display dialog "Keychain update failed. Please try again" with icon 2 buttons {"OK"} default button 1
             -- If OK button is clicked
             if button returned of the result is "OK" then
                 -- Try & update the users keychain password
@@ -1064,50 +1029,36 @@ Enable it now?" with icon 2 buttons {"No", "Yes"} default button 2)
     on createNewKeychain_(sender)
         try
             -- Log option choosen
-            log "User selected create new keychain..."
+            log "User selected create new keychain."
             -- If running 10.9.+, then delete the local items keychain too
             if osVersion is greater than 8 then
                 -- Get the Macs UUID
                 set macUUID to do shell script "system_profiler SPHardwareDataType | awk '/Hardware UUID:/{ print $NF}'"
-                log "Retreived this Macs UUID..."
-                -- Try to delete the local items Keychain db's
-                try
+                try -- to delete the local items Keychain dbs
                     do shell script "rm -rf ~/Library/Keychains/" & macUUID & "/*"
-                    log "Deleted local items keychain..."
+                    log "Deleted local items keychain."
                 end try
                 -- Delete the login Keychain
-                try
-                    do shell script "security delete-keychain ~/Library/Keychains/login.keychain"
-                    log "Deleted old login.keychain..."
-                    on error -- If cannot find the login keychain, then prompt to create a new one.
-                    log "Couldn't find old Login Keychain..."
-                    cannotFindKeychain_(me)
-                end try
+                deleteLoginKeychain_(me)
                 -- Close the password prompt window
                 closePasswordPromptWindow_(me)
                 -- 10.9.x needs the mac client to restart as securityd or another daemon process owned by the system is used to update the local items keychain
                 log "Prompting to restart"
-                display dialog "Your Mac needs to restart to finish updating your Keychain. Please dismiss any Local Items keychain prompts, close any open Applications & click Restart Now." with icon 0 buttons ("Restart Now")
+                display dialog "Your Mac needs to restart to finish updating your Keychain. Please dismiss any Local Items keychain prompts, close any open Applications and click Restart Now." with icon 0 buttons {"Later","Restart Now"} default button 2
                 -- set to false
                 set my keychainCreateNew to false
                 -- Restart the Mac
-                log "Restarting..."
+                log "Restarting…"
                 tell application "System Events"
                     restart
                 end tell
                 
-                else
+            else
                 -- Delete the login Keychain
-                try
-                    do shell script "security delete-keychain ~/Library/Keychains/login.keychain"
-                    log "Deleted old keychain..."
-                    on error -- If cannot find the login keychain, then prompt to create a new one.
-                    log "Couldn't find old Login Keychain..."
-                    cannotFindKeychain_(me)
-                end try
-                -- Create a new login Keychain with the new password enrtered
+                deleteLoginKeychain_(me)
+                -- Create a new login Keychain with the new password entered
                 do shell script "security create-keychain -p " & quoted form of enteredNewPassword & " ~/Library/Keychains/login.keychain"
-                log "New keychain created!"
+                log "New keychain created."
                 -- set to false
                 set my keychainCreateNew to false
                 -- Set Keychain settings to make sure they are unlocked
@@ -1117,12 +1068,23 @@ Enable it now?" with icon 2 buttons {"No", "Yes"} default button 2)
             end if
             on error
             log "Creating a new keychain failed..."
-            display dialog "New Keychain creation failed. Please try again" with icon 2 buttons {"OK"} default button "OK"
+            display dialog "New Keychain creation failed. Please try again" with icon 2 buttons {"OK"} default button 1
             if button returned of the result is "OK" then
                 keychainPasswordPrompt_(me)
             end if
         end try
     end createNewKeychain_
+
+    -- Deletes the login keychain using the security command
+    on deleteLoginKeychain_(sender)
+        try
+            do shell script "security delete-keychain ~/Library/Keychains/login.keychain"
+            log "Deleted old login keychain."
+        on error -- If cannot find the login keychain, then prompt to create a new one.
+            log "Couldn't find old Login Keychain."
+            cannotFindKeychain_(me)
+        end try
+    end deleteLoginKeychain_
 
     -- Set Keychain settings to make sure they are unlocked
     on setKeychainSettings_(sender)
@@ -1174,7 +1136,7 @@ Enable it now?" with icon 2 buttons {"No", "Yes"} default button 2)
 
     -- pwPolicy advanced display settings
     on pwPolicyDisplay_(sender)
-        -- Retreive pwPolicyURL's variables values, quoted to resolve issues with spaces
+        -- Retrieve pwPolicyURL's variables values, quoted to resolve issues with spaces
         tell defaults to set my pwPolicyURLButtonTitle to objectForKey_("pwPolicyURLButtonTitle") as string
         tell defaults to set my pwPolicyURLButtonURL to objectForKey_("pwPolicyURLButtonURL") as string
         tell defaults to set my pwPolicyURLButtonBrowser to objectForKey_("pwPolicyURLButtonBrowser") as string
@@ -1309,9 +1271,6 @@ Enable it now?" with icon 2 buttons {"No", "Yes"} default button 2)
     on setPasswordCheckInterval_(sender)
         set my passwordCheckInterval to sender's intValue() as integer
         tell defaults to setObject_forKey_(passwordCheckInterval, "passwordCheckInterval")
-        set unit to " hours"
-        if my passwordCheckInterval is equal to 1 then set unit to " hour"
-        log "Set check interval to " & passwordCheckInterval & unit
         -- reset the timer
         resetIntervalTimer_(me)
     end setPasswordCheckInterval_
@@ -1320,10 +1279,13 @@ Enable it now?" with icon 2 buttons {"No", "Yes"} default button 2)
     on resetIntervalTimer_(sender)
         my processTimer's invalidate() -- kills the existing timer
         -- start a timer with the new interval
+        set unit to " hours"
+        if my passwordCheckInterval is equal to 1 then set unit to " hour"
         try
             set my processTimer to current application's NSTimer's scheduledTimerWithTimeInterval_target_selector_userInfo_repeats_((my passwordCheckInterval as integer * 3600), me, "intervalDoProcess:", missing value, true)
+            log "Set check interval to " & passwordCheckInterval & unit
         on error theError
-            log theError
+            log "Could not reset check interval. Error: " & theError
         end try
     end resetIntervalTimer_
 
@@ -1522,9 +1484,6 @@ Please choose your configuration options."
         doSelectedBehaviourCheck_(me) -- Check for Selected Behaviour
         createMenu_(me)  -- build and display the status menu item
         domainTest_(me)  -- test domain connectivity
-        --if my onDomain is false then
-        --    return  -- stop the process if no domain connectivity
-        --end if
         canPassExpire_(me)
         if passExpires then
             -- if we're using Auto and we don't have the password expiration age, check for kerberos ticket
