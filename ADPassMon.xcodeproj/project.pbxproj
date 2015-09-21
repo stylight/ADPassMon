@@ -16,6 +16,7 @@
 		391FC4F21361276900D2E33C /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 391FC4F11361276900D2E33C /* README.md */; };
 		39925B9F133CE6E8001C9566 /* LaunchAtLoginController.m in Sources */ = {isa = PBXBuildFile; fileRef = 39925B9E133CE6E8001C9566 /* LaunchAtLoginController.m */; };
 		39952F35133BAD5800A8DD42 /* StatusMenuController.m in Sources */ = {isa = PBXBuildFile; fileRef = 39952F34133BAD5800A8DD42 /* StatusMenuController.m */; };
+		39D5363D1BB0744400D64989 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 39D5363B1BB0744400D64989 /* MainMenu.xib */; settings = {ASSET_TAGS = (); }; };
 		39DC46FB1B6A6DF000AABB81 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 39DC46FA1B6A6DF000AABB81 /* Images.xcassets */; };
 		7C36C8481B9837C100D56827 /* AppIcon.icns in Resources */ = {isa = PBXBuildFile; fileRef = 7C36C8471B9837C100D56827 /* AppIcon.icns */; };
 /* End PBXBuildFile section */
@@ -50,6 +51,7 @@
 		39925B9E133CE6E8001C9566 /* LaunchAtLoginController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LaunchAtLoginController.m; sourceTree = "<group>"; };
 		39952F33133BAD5800A8DD42 /* StatusMenuController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StatusMenuController.h; sourceTree = "<group>"; };
 		39952F34133BAD5800A8DD42 /* StatusMenuController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = StatusMenuController.m; sourceTree = "<group>"; };
+		39D5363C1BB0744400D64989 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		39DC46FA1B6A6DF000AABB81 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		7C36C8471B9837C100D56827 /* AppIcon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = AppIcon.icns; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -109,6 +111,7 @@
 		39094F2B1338DBE4007821C2 /* ADPassMon */ = {
 			isa = PBXGroup;
 			children = (
+				39D5363B1BB0744400D64989 /* MainMenu.xib */,
 				39DC46FA1B6A6DF000AABB81 /* Images.xcassets */,
 				39094F2C1338DBE4007821C2 /* Supporting Files */,
 			);
@@ -196,6 +199,7 @@
 				7C36C8481B9837C100D56827 /* AppIcon.icns in Resources */,
 				39DC46FB1B6A6DF000AABB81 /* Images.xcassets in Resources */,
 				391FC4F21361276900D2E33C /* README.md in Resources */,
+				39D5363D1BB0744400D64989 /* MainMenu.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -230,6 +234,14 @@
 				39094F351338DBE4007821C2 /* en */,
 			);
 			name = Credits.rtf;
+			sourceTree = "<group>";
+		};
+		39D5363B1BB0744400D64989 /* MainMenu.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				39D5363C1BB0744400D64989 /* en */,
+			);
+			name = MainMenu.xib;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */
