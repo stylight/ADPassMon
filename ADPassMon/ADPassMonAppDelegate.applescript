@@ -253,7 +253,7 @@ Enable it now?" with icon 2 buttons {"No","Yes"} default button 2)
     on doKeychainLockCheck_(sender)
         tell defaults to set my enableKeychainLockCheck to objectForKey_("enableKeychainLockCheck") as integer
         if my enableKeychainLockCheck is 1 then
-            log "  Testing Keychain Lock state..."
+            log "Testing Keychain Lock state..."
             -- check for login keycchain path
             try
                 do shell script "security unlock-keychain -p ~/Library/Keychains/login.keychain"
@@ -268,7 +268,7 @@ Enable it now?" with icon 2 buttons {"No","Yes"} default button 2)
                 closeKeychainAccess_(me)
             end if
         else
-            log "  Skipping Keychain Lock state check..."
+            log "Skipping Keychain Lock state check..."
         end if
     end doKeychainLockCheck_
     
@@ -454,7 +454,7 @@ Enable it now?" with icon 2 buttons {"No","Yes"} default button 2)
         try
             if first character of uAC is "6" then
                 set passExpires to false
-                log "  Password does NOT expire."
+                log "  Password does not expire."
             else
                 log "  Password does expire."
             end if
@@ -1446,7 +1446,7 @@ Please choose your configuration options."
         menuItem's setTitle_("Re-check Expiration")
         menuItem's setTarget_(me)
         menuItem's setAction_("doProcess:")
-        menuItem's setEnabled_(true)
+        menuItem's setEnabled_(passExpires as boolean)
         statusMenu's addItem_(menuItem)
         menuItem's release()
 
@@ -1484,42 +1484,46 @@ Please choose your configuration options."
         doSelectedBehaviourCheck_(me) -- Check for Selected Behaviour
         createMenu_(me)  -- build and display the status menu item
         domainTest_(me)  -- test domain connectivity
-        canPassExpire_(me)
-        if passExpires then
-            -- if we're using Auto and we don't have the password expiration age, check for kerberos ticket
-            if my expireDateUnix = 0 and my selectedMethod = 0 then
-                doKerbCheck_(me)
-                if first_run then -- only display prefs window if running for first time
-                    if prefsLocked as integer is equal to 0 then -- only display the window if prefs are not locked
-                        log "First launch, waiting for settings..."
-                        theWindow's makeKeyAndOrderFront_(null)
-                        set my theMessage to "Welcome!\nPlease choose your configuration options."
-                        set first_run to false
+        if my onDomain is true then
+            canPassExpire_(me)
+            if passExpires then
+                -- if we're using Auto and we don't have the password expiration age, check for kerberos ticket
+                if my expireDateUnix = 0 and my selectedMethod = 0 then
+                    doKerbCheck_(me)
+                    if first_run then -- only display prefs window if running for first time
+                        if prefsLocked as integer is equal to 0 then -- only display the window if prefs are not locked
+                            log "First launch, waiting for settings..."
+                            theWindow's makeKeyAndOrderFront_(null)
+                            set my theMessage to "Welcome!\nPlease choose your configuration options."
+                            set first_run to false
+                        end if
                     end if
+                    else if my selectedMethod is 1 then
+                    set my manualExpireDays to expireAge
+                    set my isHidden to true
+                    set my isManualEnabled to true
+                    doProcess_(me)
+                else if my selectedMethod is 0 then
+                    set my isHidden to false
+                    set my isManualEnabled to false
+                    set my manualExpireDays to ""
+                    doProcess_(me)
                 end if
-            else if my selectedMethod is 1 then
-                set my manualExpireDays to expireAge
-                set my isHidden to true
-                set my isManualEnabled to true
-                doProcess_(me)
-            else if my selectedMethod is 0 then
-                set my isHidden to false
-                set my isManualEnabled to false
-                set my manualExpireDays to ""
-                doProcess_(me)
-            end if
         
-            watchForWake_(me)
+                watchForWake_(me)
             
-            -- Set a timer to check for domain connectivity every five minutes. (300)
-            set my domainTimer to NSTimer's scheduledTimerWithTimeInterval_target_selector_userInfo_repeats_(300, me, "intervalDomainTest:", missing value, true)
+                -- Set a timer to check for domain connectivity every five minutes. (300)
+                set my domainTimer to NSTimer's scheduledTimerWithTimeInterval_target_selector_userInfo_repeats_(300, me, "intervalDomainTest:", missing value, true)
             
-            -- Set a timer to trigger doProcess handler on an interval and spawn notifications (if enabled).
-            set my processTimer to NSTimer's scheduledTimerWithTimeInterval_target_selector_userInfo_repeats_((my passwordCheckInterval * 3600), me, "intervalDoProcess:", missing value, true)
+                -- Set a timer to trigger doProcess handler on an interval and spawn notifications (if enabled).
+                set my processTimer to NSTimer's scheduledTimerWithTimeInterval_target_selector_userInfo_repeats_((my passwordCheckInterval * 3600), me, "intervalDoProcess:", missing value, true)
+            else
+                log "Stopping."
+                updateMenuTitle_("[--]", "Your password does not expire.")
+                set my theMessage to "Your password does not expire."
+            end if
         else
-            log "Password does not expire. Stopping."
-            updateMenuTitle_("[--]", "Your password does not expire.")
-            set my theMessage to "Your password does not expire."
+            --offlineUpdate_(me)
         end if
     end applicationWillFinishLaunching_
     
