@@ -416,9 +416,9 @@ DQ
                         </connections>
                     </button>
                     <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" id="p2k-OO-HR4">
-                        <rect key="frame" x="17" y="150" width="99" height="125"/>
+                        <rect key="frame" x="20" y="153" width="93" height="119"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                        <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" imageFrameStyle="grayBezel" image="AppIcon" id="D7N-Az-Q90"/>
+                        <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="AppIcon" id="D7N-Az-Q90"/>
                     </imageView>
                     <button hidden="YES" verticalHuggingPriority="750" id="wbQ-5g-Put">
                         <rect key="frame" x="211" y="13" width="164" height="32"/>
