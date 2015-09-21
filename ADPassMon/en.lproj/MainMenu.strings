@@ -1,0 +1,117 @@
+
+/* Class = "NSWindow"; title = "ADPassMon Preferences"; ObjectID = "371"; */
+"371.title" = "ADPassMon Preferences";
+
+/* Class = "NSButtonCell"; title = "Revert to Defaults"; ObjectID = "601"; */
+"601.title" = "Revert to Defaults";
+
+/* Class = "NSTextFieldCell"; title = "Status"; ObjectID = "755"; */
+"755.title" = "Status";
+
+/* Class = "NSTabViewItem"; label = "Settings"; ObjectID = "934"; */
+"934.label" = "Settings";
+
+/* Class = "NSTabViewItem"; label = "Reset"; ObjectID = "935"; */
+"935.label" = "Reset";
+
+/* Class = "NSTextField"; ibShadowedToolTip = "Enter maximum password age, in days"; ObjectID = "941"; */
+"941.ibShadowedToolTip" = "Enter maximum password age, in days";
+
+/* Class = "NSTextFieldCell"; placeholderString = "days"; ObjectID = "953"; */
+"953.placeholderString" = "days";
+
+/* Class = "NSButtonCell"; ibShadowedToolTip = "Manually enter maximum password age, in days"; ObjectID = "956"; */
+"956.ibShadowedToolTip" = "Manually enter maximum password age, in days";
+
+/* Class = "NSButtonCell"; title = "Manual:"; ObjectID = "956"; */
+"956.title" = "Manual:";
+
+/* Class = "NSButtonCell"; ibShadowedToolTip = "Query Active Directory for password age info"; ObjectID = "957"; */
+"957.ibShadowedToolTip" = "Query Active Directory for password age info";
+
+/* Class = "NSButtonCell"; title = "Automatic"; ObjectID = "957"; */
+"957.title" = "Automatic";
+
+/* Class = "NSButtonCell"; title = "Radio"; ObjectID = "958"; */
+"958.title" = "Radio";
+
+/* Class = "NSTextFieldCell"; title = "Maximum password age discovery method:"; ObjectID = "959"; */
+"959.title" = "Maximum password age discovery method:";
+
+/* Class = "NSTextFieldCell"; title = "If you're having trouble with ADPassMon, use this button to remove your saved settings and revert to defaults."; ObjectID = "978"; */
+"978.title" = "If you're having trouble with ADPassMon, use this button to remove your saved settings and revert to defaults.";
+
+/* Class = "NSButton"; ibShadowedToolTip = "Enable notifications for upcoming password expiration "; ObjectID = "0ni-Bt-6UB"; */
+"0ni-Bt-6UB.ibShadowedToolTip" = "Enable notifications for upcoming password expiration ";
+
+/* Class = "NSTextFieldCell"; title = "Note: Press Enter after modifying values to apply changes"; ObjectID = "56e-Qk-hf9"; */
+"56e-Qk-hf9.title" = "Note: Press Enter after modifying values to apply changes";
+
+/* Class = "NSButtonCell"; ibShadowedToolTip = "Use OS X's native password change method"; ObjectID = "F4e-NZ-4w1"; */
+"F4e-NZ-4w1.ibShadowedToolTip" = "Use OS X's native password change method";
+
+/* Class = "NSButtonCell"; title = "Native OS"; ObjectID = "F4e-NZ-4w1"; */
+"F4e-NZ-4w1.title" = "Native OS";
+
+/* Class = "NSButton"; ibShadowedToolTip = "Allow password changes"; ObjectID = "H8x-qd-ykj"; */
+"H8x-qd-ykj.ibShadowedToolTip" = "Allow password changes";
+
+/* Class = "NSTextFieldCell"; title = "Expiration check interval (in hours):"; ObjectID = "NGb-V5-ypz"; */
+"NGb-V5-ypz.title" = "Expiration check interval (in hours):";
+
+/* Class = "NSTextFieldCell"; title = "Verify Password:"; ObjectID = "OOI-0S-4HL"; */
+"OOI-0S-4HL.title" = "Verify Password:";
+
+/* Class = "NSButton"; ibShadowedToolTip = "Launch ADPassMon automatically during each login"; ObjectID = "Pnx-0c-4oX"; */
+"Pnx-0c-4oX.ibShadowedToolTip" = "Launch ADPassMon automatically during each login";
+
+/* Class = "NSTextFieldCell"; placeholderString = "hours"; ObjectID = "UTP-Hc-0QO"; */
+"UTP-Hc-0QO.placeholderString" = "hours";
+
+/* Class = "NSButtonCell"; title = "Use Notifications"; ObjectID = "WcR-NJ-wJj"; */
+"WcR-NJ-wJj.title" = "Use Notifications";
+
+/* Class = "NSTextFieldCell"; title = "Old Password:"; ObjectID = "XOA-h1-Rt6"; */
+"XOA-h1-Rt6.title" = "Old Password:";
+
+/* Class = "NSTextFieldCell"; title = "New Password:"; ObjectID = "XYr-yE-6ZY"; */
+"XYr-yE-6ZY.title" = "New Password:";
+
+/* Class = "NSButtonCell"; title = "Radio"; ObjectID = "b8j-WS-2d8"; */
+"b8j-WS-2d8.title" = "Radio";
+
+/* Class = "NSTextField"; ibShadowedToolTip = "Enter the number of hours in between checks"; ObjectID = "bX1-60-OE8"; */
+"bX1-60-OE8.ibShadowedToolTip" = "Enter the number of hours in between checks";
+
+/* Class = "NSButtonCell"; ibShadowedToolTip = "Use ADPassMon's password change method"; ObjectID = "h5X-Ak-kkH"; */
+"h5X-Ak-kkH.ibShadowedToolTip" = "Use ADPassMon's password change method";
+
+/* Class = "NSButtonCell"; title = "ADPassMon"; ObjectID = "h5X-Ak-kkH"; */
+"h5X-Ak-kkH.title" = "ADPassMon";
+
+/* Class = "NSTextFieldCell"; title = "Multiline Label"; ObjectID = "lm9-au-iuR"; */
+"lm9-au-iuR.title" = "Multiline Label";
+
+/* Class = "NSButtonCell"; title = "Check Keychain at launch"; ObjectID = "pwy-ON-ivB"; */
+"pwy-ON-ivB.title" = "Check Keychain at launch";
+
+/* Class = "NSButtonCell"; title = "Create New Keychain"; ObjectID = "qRw-Nh-2LX"; */
+"qRw-Nh-2LX.title" = "Create New Keychain";
+
+/* Class = "NSButtonCell"; title = "Allow password changes, using:"; ObjectID = "rcN-zT-bXZ"; */
+"rcN-zT-bXZ.title" = "Allow password changes, using:";
+
+/* Class = "NSTextFieldCell"; title = "How many days before expiration do you want to be notified?"; ObjectID = "txH-ok-ehC"; */
+"txH-ok-ehC.title" = "How many days before expiration do you want to be notified?";
+
+/* Class = "NSButtonCell"; title = "Add to Login Items"; ObjectID = "ucq-3h-eyG"; */
+"ucq-3h-eyG.title" = "Add to Login Items";
+
+/* Class = "NSTextFieldCell"; placeholderString = "days"; ObjectID = "vU1-zE-rr2"; */
+"vU1-zE-rr2.placeholderString" = "days";
+
+/* Class = "NSButton"; ibShadowedToolTip = "Check if keychain is locked at launch and offer to fix it"; ObjectID = "vdQ-Sa-DwV"; */
+"vdQ-Sa-DwV.ibShadowedToolTip" = "Check if keychain is locked at launch and offer to fix it";
+
+/* Class = "NSButtonCell"; title = "Test Settings"; ObjectID = "xEf-AO-yOv"; */
+"xEf-AO-yOv.title" = "Test Settings";
