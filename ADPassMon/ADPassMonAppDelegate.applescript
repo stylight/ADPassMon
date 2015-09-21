@@ -290,6 +290,7 @@ Enable it now?" with icon 2 buttons {"No","Yes"} default button 2)
         tell defaults to registerDefaults_({menu_title: "[ ? ]", ¬
                                             tooltip:tooltip, ¬
                                             fist_run:first_run, ¬
+                                            passExpires:passExpires, ¬
                                             selectedMethod:0, ¬
                                             isManualEnabled:isManualEnabled, ¬
                                             enableNotifications:enableNotifications, ¬
@@ -320,6 +321,7 @@ Enable it now?" with icon 2 buttons {"No","Yes"} default button 2)
     on retrieveDefaults_(sender)
         tell defaults to set my menu_title to objectForKey_("menu_title")
         tell defaults to set my first_run to objectForKey_("first_run")
+        tell defaults to set my passExpires to objectForKey_("passExpires") as boolean
         tell defaults to set my selectedMethod to objectForKey_("selectedMethod") as integer
         tell defaults to set my isManualEnabled to objectForKey_("isManualEnabled") as integer
         tell defaults to set my enableNotifications to objectForKey_("enableNotifications") as integer
@@ -455,6 +457,10 @@ Enable it now?" with icon 2 buttons {"No","Yes"} default button 2)
             if first character of uAC is "6" then
                 set passExpires to false
                 log "  Password does not expire."
+                my statusMenu's itemWithTitle_("Re-check Expiration")'s setEnabled_(passExpires as boolean)
+                tell defaults to setObject_forKey_(passExpires, "passExpires")
+                updateMenuTitle_("[--]", "Your password does not expire.")
+                set my theMessage to "Your password does not expire."
             else
                 log "  Password does expire."
             end if
@@ -465,7 +471,7 @@ Enable it now?" with icon 2 buttons {"No","Yes"} default button 2)
 
     -- Checks for domain connectivity before checking for ticket. Also bound to Refresh Kerb menu item.
     on doKerbCheck_(sender)
-        if my onDomain is true and my skipKerb is false then
+        if my onDomain is true and my passExpires is true and my skipKerb is false then
             if selectedMethod = 0 then
                 doLionKerb_(me)
             else -- if selectedMethod = 1
@@ -1350,6 +1356,7 @@ Enable it now?" with icon 2 buttons {"No","Yes"} default button 2)
     on revertDefaults_(sender)
         tell defaults to removeObjectForKey_("menu_title")
         tell defaults to removeObjectForKey_("first_run")
+        tell defaults to removeObjectForKey_("passExpires")
         tell defaults to removeObjectForKey_("tooltip")
         tell defaults to removeObjectForKey_("selectedMethod")
         tell defaults to removeObjectForKey_("enableNotifications")
@@ -1519,8 +1526,6 @@ Please choose your configuration options."
                 set my processTimer to NSTimer's scheduledTimerWithTimeInterval_target_selector_userInfo_repeats_((my passwordCheckInterval * 3600), me, "intervalDoProcess:", missing value, true)
             else
                 log "Stopping."
-                updateMenuTitle_("[--]", "Your password does not expire.")
-                set my theMessage to "Your password does not expire."
             end if
         else
             --offlineUpdate_(me)
