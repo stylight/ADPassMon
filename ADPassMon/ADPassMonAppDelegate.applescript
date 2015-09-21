@@ -838,12 +838,12 @@ Enable it now?" with icon 2 buttons {"No","Yes"} default button 2)
             end if
             -- If user did not chose to update externally or was not prompted, then continue
             if pwPolicyUpdateExternal is false
-            -- Set passwordPromptWindows settings
-            set my enablePasswordPromptWindowButton2 to false
-            set my passwordPromptWindowText to changePasswordPromptWindowText
-            showPasswordPromptWindow_(me)
+                -- Set passwordPromptWindows settings
+                set my enablePasswordPromptWindowButton2 to false
+                set my passwordPromptWindowText to changePasswordPromptWindowText
+                showPasswordPromptWindow_(me)
+            end if
         end if
-    end if
     end changePassword_
 
     -- Check to see if Keychain Access is open, as can cause some issues. Prompt use to close

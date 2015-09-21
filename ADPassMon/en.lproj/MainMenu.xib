@@ -450,7 +450,11 @@ DQ
                         </buttonCell>
                         <connections>
                             <action selector="createNewKeychain:" target="494" id="hHL-PN-zpe"/>
-                            <binding destination="494" name="hidden" keyPath="enablePasswordPromptWindowButton2" id="NTT-B3-oZR"/>
+                            <binding destination="494" name="hidden" keyPath="enablePasswordPromptWindowButton2" id="RR9-N9-UWB">
+                                <dictionary key="options">
+                                    <string key="NSValueTransformerName">NSNegateBoolean</string>
+                                </dictionary>
+                            </binding>
                         </connections>
                     </button>
                 </subviews>
