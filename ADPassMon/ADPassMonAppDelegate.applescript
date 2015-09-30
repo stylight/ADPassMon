@@ -817,16 +817,12 @@ Enable it now?" with icon 2 buttons {"No","Yes"} default button 2)
                 try -- to use UI scripting
                     set current pane to pane id "com.apple.preferences.users"
                     activate
+                    delay 1
                     tell application "System Events"
                         tell application process "System Preferences"
-                            if my osVersion is less than or equal to 6 then
-                                click radio button "Password" of tab group 1 of window "Accounts"
-                                click button "Change Password…" of tab group 1 of window "Accounts"
-                            end if
-                            if my osVersion is greater than 6 then
-                                click radio button "Password" of tab group 1 of window "Users & Groups"
-                                click button "Change Password…" of tab group 1 of window "Users & Groups"
-                            end if
+                            click radio button "Password" of tab group 1 of window "Users & Groups"
+                            click button "Change Password…" of tab group 1 of window "Users & Groups"
+                            click button "Change Password…" of window 1
                         end tell
                     end tell
                 on error theError
