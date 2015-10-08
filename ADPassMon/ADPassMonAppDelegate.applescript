@@ -1494,11 +1494,8 @@ Please choose your configuration options."
 
     -- Do processes necessary for app initiation
     on startMeUp_(sender)
-        getOS_(me)
-        regDefaults_(me) -- populate plist file with defaults (will not overwrite non-default settings))
         KerbMinderTest_(me)
         notifySetup_(me)
-        retrieveDefaults_(me) -- load defaults
         doSelectedBehaviourCheck_(me) -- Check for Selected Behaviour
         createMenu_(me)  -- build and display the status menu item
         domainTest_(me)  -- test domain connectivity
@@ -1547,11 +1544,15 @@ Please choose your configuration options."
     -- Do processes necessary for app initiation, but check if account is local first
     -- so we can break out if necessary
     on applicationWillFinishLaunching_(aNotification)
+        getOS_(me)
+        regDefaults_(me) -- populate plist file with defaults (will not overwrite non-default settings))
+        retrieveDefaults_(me) -- load defaults (from plist)
         localAccountCheck_(me)
         if my isLocalAccount is false then
             startMeUp_(me)
         else if my isLocalAccount is true and my runIfLocal is true then
             startMeUp_(me)
+            log "Running anyway due to manual override."
         end if
     end applicationWillFinishLaunching_
     
