@@ -336,7 +336,7 @@ Enable it now?" with icon 2 buttons {"No","Yes"} default button 2)
     on retrieveDefaults_(sender)
         tell defaults to set my menu_title to objectForKey_("menu_title")
         tell defaults to set my first_run to objectForKey_("first_run")
-        tell defaults to set my runIfLocal to objectForKey_("runIfLocal")
+        tell defaults to set my runIfLocal to objectForKey_("runIfLocal") as boolean
         tell defaults to set my passExpires to objectForKey_("passExpires") as boolean
         tell defaults to set my selectedMethod to objectForKey_("selectedMethod") as integer
         tell defaults to set my isManualEnabled to objectForKey_("isManualEnabled") as integer
