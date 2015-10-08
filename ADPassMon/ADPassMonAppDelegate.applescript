@@ -81,6 +81,8 @@ If you do not know your keychain password, enter your new password in the New an
 
 --- Booleans
     property first_run :            true
+    property isLocalAccount :       false
+    property runIfLocal :           false
     property isIdle :               true
     property isHidden :             false
     property isManualEnabled :      false
@@ -151,6 +153,19 @@ If you do not know your keychain password, enter your new password in the New an
         set my osVersion to (do shell script "sw_vers -productVersion | awk -F. '{print $2}'") as integer
         log "Running on OS 10." & osVersion & ".x"
     end getOS_
+    
+    -- Check if running in a local account
+    on localAccountCheck_(sender)
+        set accountLoc to (do shell script "dscl localhost read /Search/Users/$USER AuthenticationAuthority | grep -c 'LKDC'") as integer
+        if accountLoc is greater than 0 then
+            set my isLocalAccount to true
+            log "Running under a local account."
+        else
+            set my isLocalAccount to false
+            log "Running under an AD account."
+        end if
+    end localAccountCheck_
+    
     
     -- Check & log the selected Behaviour
     on doSelectedBehaviourCheck_(sender)
@@ -1476,9 +1491,9 @@ Please choose your configuration options."
         statusMenuController's createStatusItemWithMenu_(statusMenu)
         statusMenu's release()
     end createMenu_
-    
+
     -- Do processes necessary for app initiation
-    on applicationWillFinishLaunching_(aNotification)
+    on startMeUp_(sender)
         getOS_(me)
         regDefaults_(me) -- populate plist file with defaults (will not overwrite non-default settings))
         KerbMinderTest_(me)
@@ -1506,25 +1521,37 @@ Please choose your configuration options."
                     set my isHidden to true
                     set my isManualEnabled to true
                     doProcess_(me)
-                else if my selectedMethod is 0 then
+                    else if my selectedMethod is 0 then
                     set my isHidden to false
                     set my isManualEnabled to false
                     set my manualExpireDays to ""
                     doProcess_(me)
                 end if
-        
+                
                 watchForWake_(me)
-            
+                
                 -- Set a timer to check for domain connectivity every five minutes. (300)
                 set my domainTimer to NSTimer's scheduledTimerWithTimeInterval_target_selector_userInfo_repeats_(300, me, "intervalDomainTest:", missing value, true)
-            
+                
                 -- Set a timer to trigger doProcess handler on an interval and spawn notifications (if enabled).
                 set my processTimer to NSTimer's scheduledTimerWithTimeInterval_target_selector_userInfo_repeats_((my passwordCheckInterval * 3600), me, "intervalDoProcess:", missing value, true)
-            else
+                else
                 log "Stopping."
             end if
-        else
+            else
             --offlineUpdate_(me)
+        end if
+    end startMeUp_
+
+
+    -- Do processes necessary for app initiation, but check if account is local first
+    -- so we can break out if necessary
+    on applicationWillFinishLaunching_(aNotification)
+        localAccountCheck_(me)
+        if my isLocalAccount is false then
+            startMeUp_(me)
+        else if my isLocalAccount is true and my runIfLocal is true then
+            startMeUp_(me)
         end if
     end applicationWillFinishLaunching_
     
