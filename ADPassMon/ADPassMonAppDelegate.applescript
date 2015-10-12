@@ -80,63 +80,63 @@ If you do not know your keychain password, enter your new password in the New an
     property pwPolicyString : missing value
 
 --- Booleans
-    property first_run :            true
-    property isLocalAccount :       false
-    property runIfLocal :           false
-    property isIdle :               true
-    property isHidden :             false
-    property isManualEnabled :      false
-    property enableNotifications :  true
-    property enableKerbMinder :     false
-    property prefsLocked :          false
-    property launchAtLogin :        false
-    property skipKerb :             false
-    property onDomain :             false
-    property passExpires :          true
-    property goEasy :               false
-    property showChangePass :       false
-    property KerbMinderInstalled :  false
+    property first_run :                true
+    property isLocalAccount :           false
+    property runIfLocal :               false
+    property isIdle :                   true
+    property isHidden :                 false
+    property isManualEnabled :          false
+    property enableNotifications :      true
+    property enableKerbMinder :         false
+    property prefsLocked :              false
+    property launchAtLogin :            false
+    property skipKerb :                 false
+    property onDomain :                 false
+    property passExpires :              true
+    property goEasy :                   false
+    property showChangePass :           false
+    property KerbMinderInstalled :      false
     property enablePasswordPromptWindowButton2 : false
     property firstPasswordCheckPassed : true
-    property userPasswordChanged : false
-    property pwPolicyUpdateExternal : false
-    property allowPasswordChange : true
-    property keychainCreateNew : false
-    property enablePasswordPolicy : false
-    property keychainPolicyEnabled : false
-    property passwordCheckPassed : false
+    property userPasswordChanged :      false
+    property pwPolicyUpdateExternal :   false
+    property allowPasswordChange :      true
+    property keychainCreateNew :        false
+    property enablePasswordPolicy :     false
+    property keychainPolicyEnabled :    false
+    property passwordCheckPassed :      false
     
 --- Other Properties
-    property warningDays :      14
-    property menu_title :       "[ ? ]"
-    property accTest :          1
-    property tooltip :          "Waiting for data…"
-    property osVersion :        ""
-    property kerb :             ""
-    property myLDAP :           ""
-    property mySearchBase :     ""
-    property expireAge :        0
-    property expireAgeUnix :    ""
-    property expireDate:        ""
-    property expireDateUnix:    ""
-    property uAC :              ""
-    property pwdSetDate :       ""
-    property pwdSetDateUnix :   0
-    property plistPwdSetDate :  0
-    property pwPolicy :         ""
-    property pwPolicyButton :   "OK"
-    property today :            ""
-    property todayUnix :        ""
-    property daysUntilExp :     ""
-    property daysUntilExpNice : ""
-    property expirationDate :   ""
-    property mavAccStatus :     ""
-    property passwordCheckInterval : 4  -- hours
-    property enableKeychainLockCheck : ""
-    property selectedBehaviour : 1
-    property keychainPolicy : ""
-    property pwPolicyURLButtonTitle : ""
-    property pwPolicyURLButtonURL : ""
+    property warningDays :              14
+    property menu_title :               "[ ? ]"
+    property accTest :                  1
+    property tooltip :                  "Waiting for data…"
+    property osVersion :                ""
+    property kerb :                     ""
+    property myLDAP :                   ""
+    property mySearchBase :             ""
+    property expireAge :                0
+    property expireAgeUnix :            ""
+    property expireDate:                ""
+    property expireDateUnix:            ""
+    property uAC :                      ""
+    property pwdSetDate :               ""
+    property pwdSetDateUnix :           0
+    property plistPwdSetDate :          0
+    property pwPolicy :                 ""
+    property pwPolicyButton :           "OK"
+    property today :                    ""
+    property todayUnix :                ""
+    property daysUntilExp :             ""
+    property daysUntilExpNice :         ""
+    property expirationDate :           ""
+    property mavAccStatus :             ""
+    property passwordCheckInterval :    4  -- hours
+    property enableKeychainLockCheck :  ""
+    property selectedBehaviour :        1
+    property keychainPolicy :           ""
+    property pwPolicyURLButtonTitle :   ""
+    property pwPolicyURLButtonURL :     ""
     property pwPolicyURLButtonBrowser : ""
 
 --- HANDLERS ---
@@ -156,16 +156,15 @@ If you do not know your keychain password, enter your new password in the New an
     
     -- Check if running in a local account
     on localAccountCheck_(sender)
-        set accountLoc to (do shell script "dscl localhost read /Search/Users/$USER AuthenticationAuthority | grep -c 'LKDC'") as integer
-        if accountLoc is greater than 0 then
+        set accountLoc to (do shell script "dscl localhost read /Search/Users/$USER AuthenticationAuthority") as string
+        if "Active Directory" is in accountLoc then
+            set my isLocalAccount to false
+            log "Running under a network account."
+        else
             set my isLocalAccount to true
             log "Running under a local account."
-        else
-            set my isLocalAccount to false
-            log "Running under an AD account."
         end if
     end localAccountCheck_
-    
     
     -- Check & log the selected Behaviour
     on doSelectedBehaviourCheck_(sender)
@@ -210,7 +209,11 @@ If you do not know your keychain password, enter your new password in the New an
                             if mavAccStatus is "" then
                                 log "  Not enabled"
                                 try
-                                    do shell script "sqlite3 '/Library/Application Support/com.apple.TCC/TCC.db' \"INSERT INTO access VALUES('kTCCServiceAccessibility','org.pmbuko.ADPassMon',0,1,1,NULL);\"" with administrator privileges
+                                    if osVersion is less than 11 then
+                                        do shell script "sqlite3 '/Library/Application Support/com.apple.TCC/TCC.db' \"INSERT INTO access VALUES('kTCCServiceAccessibility','org.pmbuko.ADPassMon',0,1,1,NULL);\"" with administrator privileges
+                                    else
+                                        do shell script "sqlite3 '/Library/Application Support/com.apple.TCC/TCC.db' \"INSERT INTO access VALUES('kTCCServiceAccessibility','org.pmbuko.ADPassMon',0,1,1,NULL,NULL);\"" with administrator privileges
+                                    end if
                                     set my accTest to 0
                                     tell defaults to setObject_forKey_(0, "accTest")
                                 on error theError
@@ -274,7 +277,7 @@ Enable it now?" with icon 2 buttons {"No","Yes"} default button 2)
                 do shell script "security unlock-keychain -p ~/Library/Keychains/login.keychain"
                 set keychainState to "unlocked"
                 log "  Keychain unlocked..."
-                on error
+            on error
                 set keychainState to "locked"
             end try
             -- If keychain is locked, the prompt user...
@@ -304,7 +307,8 @@ Enable it now?" with icon 2 buttons {"No","Yes"} default button 2)
         tell current application's NSUserDefaults to set defaults to standardUserDefaults()
         tell defaults to registerDefaults_({menu_title: "[ ? ]", ¬
                                             tooltip:tooltip, ¬
-                                            fist_run:first_run, ¬
+                                            first_run:first_run, ¬
+                                            runIfLocal:runIfLocal, ¬
                                             passExpires:passExpires, ¬
                                             selectedMethod:0, ¬
                                             isManualEnabled:isManualEnabled, ¬
@@ -1541,10 +1545,9 @@ Please choose your configuration options."
         end if
     end startMeUp_
 
-
     -- Do processes necessary for app initiation, but check if account is local first
     -- so we can break out if necessary
-    on applicationWillFinishLaunching_(aNotification)
+    on applicationWillFinishLaunching_(sender)
         getOS_(me)
         regDefaults_(me) -- populate plist file with defaults (will not overwrite non-default settings))
         retrieveDefaults_(me) -- load defaults (from plist)
@@ -1552,8 +1555,10 @@ Please choose your configuration options."
         if my isLocalAccount is false then
             startMeUp_(me)
         else if my isLocalAccount is true and my runIfLocal is true then
+            log "  Proceeding due to manual override."
             startMeUp_(me)
-            log "Running anyway due to manual override."
+        else
+            log "  Stopping."
         end if
     end applicationWillFinishLaunching_
     
@@ -1563,7 +1568,9 @@ Please choose your configuration options."
 
     -- This will immediately release the space in the menubar on quit
     on applicationWillTerminate_(notification)
-        statusMenuController's releaseStatusItem()
-        statusMenuController's release()
+        try -- adding this to avoid errors when running under local accounts
+            statusMenuController's releaseStatusItem()
+            statusMenuController's release()
+        end try
     end applicationWillTerminate_
 end script
