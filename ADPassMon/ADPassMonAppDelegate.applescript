@@ -156,13 +156,13 @@ If you do not know your keychain password, enter your new password in the New an
     
     -- Check if running in a local account
     on localAccountCheck_(sender)
-        set accountLoc to (do shell script "dscl localhost read /Search/Users/$USER AuthenticationAuthority | grep -c 'LKDC'") as integer
-        if accountLoc is greater than 0 then
+        set accountLoc to (do shell script "dscl localhost read /Search/Users/$USER AuthenticationAuthority") as string
+        if "Active Directory" is in accountLoc then
+            set my isLocalAccount to false
+            log "Running under a network account."
+        else
             set my isLocalAccount to true
             log "Running under a local account."
-        else
-            set my isLocalAccount to false
-            log "Running under an AD account."
         end if
     end localAccountCheck_
     
@@ -209,7 +209,11 @@ If you do not know your keychain password, enter your new password in the New an
                             if mavAccStatus is "" then
                                 log "  Not enabled"
                                 try
-                                    do shell script "sqlite3 '/Library/Application Support/com.apple.TCC/TCC.db' \"INSERT INTO access VALUES('kTCCServiceAccessibility','org.pmbuko.ADPassMon',0,1,1,NULL);\"" with administrator privileges
+                                    if osVersion is less than 11 then
+                                        do shell script "sqlite3 '/Library/Application Support/com.apple.TCC/TCC.db' \"INSERT INTO access VALUES('kTCCServiceAccessibility','org.pmbuko.ADPassMon',0,1,1,NULL);\"" with administrator privileges
+                                    else
+                                        do shell script "sqlite3 '/Library/Application Support/com.apple.TCC/TCC.db' \"INSERT INTO access VALUES('kTCCServiceAccessibility','org.pmbuko.ADPassMon',0,1,1,NULL,NULL);\"" with administrator privileges
+                                    end if
                                     set my accTest to 0
                                     tell defaults to setObject_forKey_(0, "accTest")
                                 on error theError
@@ -273,7 +277,7 @@ Enable it now?" with icon 2 buttons {"No","Yes"} default button 2)
                 do shell script "security unlock-keychain -p ~/Library/Keychains/login.keychain"
                 set keychainState to "unlocked"
                 log "  Keychain unlocked..."
-                on error
+            on error
                 set keychainState to "locked"
             end try
             -- If keychain is locked, the prompt user...
@@ -1543,7 +1547,7 @@ Please choose your configuration options."
 
     -- Do processes necessary for app initiation, but check if account is local first
     -- so we can break out if necessary
-    on applicationWillFinishLaunching_(aNotification)
+    on applicationWillFinishLaunching_(sender)
         getOS_(me)
         regDefaults_(me) -- populate plist file with defaults (will not overwrite non-default settings))
         retrieveDefaults_(me) -- load defaults (from plist)
@@ -1551,7 +1555,7 @@ Please choose your configuration options."
         if my isLocalAccount is false then
             startMeUp_(me)
         else if my isLocalAccount is true and my runIfLocal is true then
-            log "  Running anyway due to manual override."
+            log "  Proceeding due to manual override."
             startMeUp_(me)
         else
             log "  Stopping."
