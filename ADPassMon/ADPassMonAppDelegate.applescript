@@ -156,13 +156,13 @@ If you do not know your keychain password, enter your new password in the New an
     
     -- Check if running in a local account
     on localAccountCheck_(sender)
-        set accountLoc to (do shell script "dscl localhost read /Search/Users/$USER AuthenticationAuthority | grep -c 'LKDC'") as integer
-        if accountLoc is greater than 0
+        set accountLoc to (do shell script "dscl localhost read /Search/Users/$USER AuthenticationAuthority") as string
+        if "Active Directory" is in accountLoc then
+            set my isLocalAccount to false
+            log "Running under a network account."
+        else
             set my isLocalAccount to true
             log "Running under a local account."
-        else
-            set my isLocalAccount to false
-            log "Running under an AD account."
         end if
     end localAccountCheck_
     
