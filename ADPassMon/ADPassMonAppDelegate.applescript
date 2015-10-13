@@ -157,7 +157,7 @@ If you do not know your keychain password, enter your new password in the New an
     -- Check if running in a local account
     on localAccountCheck_(sender)
         set accountLoc to (do shell script "dscl localhost read /Search/Users/$USER AuthenticationAuthority") as string
-        if "Active Directory" is in accountLoc then
+        if "Active Directory" is in accountLoc
             set my isLocalAccount to false
             log "Running under a network account."
         else
@@ -189,7 +189,7 @@ If you do not know your keychain password, enter your new password in the New an
                 tell application "System Events"
                     set accStatus to get UI elements enabled
                 end tell
-                if accStatus is true then
+                if accStatus is true
                     log "  Enabled"
                 else
                     log "  Disabled"
@@ -210,7 +210,7 @@ If you do not know your keychain password, enter your new password in the New an
                             if mavAccStatus is ""
                                 log "  Not enabled"
                                 try
-                                    if osVersion is less than 11 then
+                                    if osVersion is less than 11
                                         do shell script "sqlite3 '/Library/Application Support/com.apple.TCC/TCC.db' \"INSERT INTO access VALUES('kTCCServiceAccessibility','org.pmbuko.ADPassMon',0,1,1,NULL);\"" with administrator privileges
                                         else
                                         do shell script "sqlite3 '/Library/Application Support/com.apple.TCC/TCC.db' \"INSERT INTO access VALUES('kTCCServiceAccessibility','org.pmbuko.ADPassMon',0,1,1,NULL,NULL);\"" with administrator privileges
@@ -517,7 +517,7 @@ Enable it now?" with icon 2 buttons {"No","Yes"} default button 2)
             log "  No ticket found"
             activate
             set response to (display dialog "No Kerberos ticket for Active Directory was found. Do you want to renew it?" with icon 2 buttons {"No","Yes"} default button 2)
-            if button returned of response is "Yes" then
+            if button returned of response is "Yes"
                 renewLionKerb_(me)
             else -- if No is clicked
                 log "  User chose not to acquire"
@@ -909,7 +909,7 @@ Enable it now?" with icon 2 buttons {"No","Yes"} default button 2)
         set the enteredVerifyPassword to (verifyPassword's stringValue()) as string
         -- Check that all password fields are filled out if changing password & not at keychain prompt
         if my passwordPromptWindowButton1 is equal to "Change"
-            if enteredOldPassword is equal to "" or enteredNewPassword is equal to "" or enteredVerifyPassword is equal to "" then
+            if enteredOldPassword is equal to "" or enteredNewPassword is equal to "" or enteredVerifyPassword is equal to ""
                 tell application "System Events"
                     display dialog "Please fill out all password fields." with icon 2 buttons {"OK"} default button 1
                 end tell
@@ -1152,7 +1152,7 @@ Enable it now?" with icon 2 buttons {"No","Yes"} default button 2)
             -- Display password policy dialog
             tell application "System Events" to display dialog pwPolicy with icon 2 buttons {"OK"}
             -- If both pwPolicyURLButtonTitle or pwPolicyURLButtonURL are set, then display second button
-            else if pwPolicyURLButtonTitle is not equal to "" and pwPolicyURLButtonURL is not equal to "" then
+            else if pwPolicyURLButtonTitle is not equal to "" and pwPolicyURLButtonURL is not equal to ""
             -- Display password policy dialog
             tell application "System Events" to display dialog pwPolicy with icon 2 buttons {"OK", pwPolicyURLButtonTitle}
             -- If pwPolicyURLButtonTitle...
@@ -1537,7 +1537,7 @@ Please choose your configuration options."
             startMeUp_(me)
         else if my isLocalAccount is true and my runIfLocal is true
             startMeUp_(me)
-            log "Running anyway due to manual override."
+            log "  Proceeding due to manual override."
         end if
     end applicationWillFinishLaunching_
     
