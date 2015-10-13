@@ -1,5 +1,3 @@
-ADPassMon.xcodeproj/project.xcworkspace/xcuserdata/btoms.xcuserdatad/UserInterfaceState.xcuserstate
-ADPassMon.xcodeproj/project.xcworkspace/xcuserdata/bukowinskip.xcuserdatad/UserInterfaceState.xcuserstate
-
+**/xcuserdata/**
 **/*.xccheckout
 **/*.xcuserstate
