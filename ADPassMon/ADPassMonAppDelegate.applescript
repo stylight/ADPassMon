@@ -1538,6 +1538,8 @@ Please choose your configuration options."
         else if my isLocalAccount is true and my runIfLocal is true
             startMeUp_(me)
             log "  Proceeding due to manual override."
+        else
+            log "  Stopping."
         end if
     end applicationWillFinishLaunching_
     
