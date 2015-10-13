@@ -158,7 +158,11 @@ If you do not know your keychain password, enter your new password in the New an
     on localAccountCheck_(sender)
         set accountLoc to (do shell script "dscl localhost read /Search/Users/$USER AuthenticationAuthority") as string
 <<<<<<< HEAD
+<<<<<<< HEAD
         if "Active Directory" is in accountLoc
+=======
+        if "Active Directory" is in accountLoc then
+>>>>>>> fa17c36bbd4918901de11ce08ce2aa783e5bbd01
 =======
         if "Active Directory" is in accountLoc then
 >>>>>>> fa17c36bbd4918901de11ce08ce2aa783e5bbd01
@@ -214,9 +218,15 @@ If you do not know your keychain password, enter your new password in the New an
                                 log "  Not enabled"
                                 try
 <<<<<<< HEAD
+<<<<<<< HEAD
                                     if osVersion is less than 11
                                         do shell script "sqlite3 '/Library/Application Support/com.apple.TCC/TCC.db' \"INSERT INTO access VALUES('kTCCServiceAccessibility','org.pmbuko.ADPassMon',0,1,1,NULL);\"" with administrator privileges
                                         else
+=======
+                                    if osVersion is less than 11 then
+                                        do shell script "sqlite3 '/Library/Application Support/com.apple.TCC/TCC.db' \"INSERT INTO access VALUES('kTCCServiceAccessibility','org.pmbuko.ADPassMon',0,1,1,NULL);\"" with administrator privileges
+                                    else
+>>>>>>> fa17c36bbd4918901de11ce08ce2aa783e5bbd01
 =======
                                     if osVersion is less than 11 then
                                         do shell script "sqlite3 '/Library/Application Support/com.apple.TCC/TCC.db' \"INSERT INTO access VALUES('kTCCServiceAccessibility','org.pmbuko.ADPassMon',0,1,1,NULL);\"" with administrator privileges
@@ -1552,6 +1562,9 @@ Please choose your configuration options."
         else if my isLocalAccount is true and my runIfLocal is true then
             log "  Proceeding due to manual override."
             startMeUp_(me)
+<<<<<<< HEAD
+>>>>>>> fa17c36bbd4918901de11ce08ce2aa783e5bbd01
+=======
 >>>>>>> fa17c36bbd4918901de11ce08ce2aa783e5bbd01
         else
             log "  Stopping."
