@@ -17,27 +17,11 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-<<<<<<< HEAD
-<<<<<<< HEAD
 	<string>2.20.10</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleVersion</key>
 	<string>0</string>
-=======
-	<string>2.20.9</string>
-	<key>CFBundleSignature</key>
-	<string>????</string>
-	<key>CFBundleVersion</key>
-	<string>2</string>
->>>>>>> fa17c36bbd4918901de11ce08ce2aa783e5bbd01
-=======
-	<string>2.20.9</string>
-	<key>CFBundleSignature</key>
-	<string>????</string>
-	<key>CFBundleVersion</key>
-	<string>2</string>
->>>>>>> fa17c36bbd4918901de11ce08ce2aa783e5bbd01
 	<key>LSApplicationCategoryType</key>
 	<string>public.app-category.utilities</string>
 	<key>LSMinimumSystemVersion</key>
