@@ -16,7 +16,7 @@
 		391FC4F21361276900D2E33C /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 391FC4F11361276900D2E33C /* README.md */; };
 		39925B9F133CE6E8001C9566 /* LaunchAtLoginController.m in Sources */ = {isa = PBXBuildFile; fileRef = 39925B9E133CE6E8001C9566 /* LaunchAtLoginController.m */; };
 		39952F35133BAD5800A8DD42 /* StatusMenuController.m in Sources */ = {isa = PBXBuildFile; fileRef = 39952F34133BAD5800A8DD42 /* StatusMenuController.m */; };
-		39D5363D1BB0744400D64989 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 39D5363B1BB0744400D64989 /* MainMenu.xib */; settings = {ASSET_TAGS = (); }; };
+		39D5363D1BB0744400D64989 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 39D5363B1BB0744400D64989 /* MainMenu.xib */; };
 		39DC46FB1B6A6DF000AABB81 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 39DC46FA1B6A6DF000AABB81 /* Images.xcassets */; };
 		7C36C8481B9837C100D56827 /* AppIcon.icns in Resources */ = {isa = PBXBuildFile; fileRef = 7C36C8471B9837C100D56827 /* AppIcon.icns */; };
 /* End PBXBuildFile section */
@@ -154,6 +154,7 @@
 				39094F1C1338DBE4007821C2 /* Frameworks */,
 				39094F1D1338DBE4007821C2 /* Resources */,
 				39925BA9133D064F001C9566 /* CopyFiles */,
+				7CC7A3981C03D1FE00853A3A /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -204,6 +205,22 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		7CC7A3981C03D1FE00853A3A /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "#\n# Sets the version string to a monotonically increased string, based on\n# the number of git commits.\n\nset -o errexit\nset -o nounset\n\nVERSION=$(git --git-dir=\"$PROJECT_DIR/.git\" --work-tree=\"$PROJECT_DIR\" log | grep '^commit' | wc -l)\n/usr/libexec/PlistBuddy -c \"Set :CFBundleVersion $VERSION\" \"$TARGET_BUILD_DIR/$INFOPLIST_PATH\"";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		39094F1B1338DBE4007821C2 /* Sources */ = {

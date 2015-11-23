@@ -6,16 +6,16 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            shouldBeEnabled = "No"
+            shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ADPassMon/ADPassMonAppDelegate.applescript"
-            timestampString = "462975679.670168"
+            timestampString = "470012547.311164"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1519"
-            endingLineNumber = "1519"
-            landmarkName = "on applicationWillFinishLaunching_(aNotification)"
+            startingLineNumber = "1567"
+            endingLineNumber = "1567"
+            landmarkName = "on startMeUp_(sender)"
             landmarkType = "5">
          </BreakpointContent>
       </BreakpointProxy>
