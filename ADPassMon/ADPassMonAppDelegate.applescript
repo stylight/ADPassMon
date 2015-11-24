@@ -92,6 +92,7 @@ If you do not know your keychain password, enter your new password in the New an
     property launchAtLogin :            false
     property skipKerb :                 false
     property onDomain :                 false
+    property freshDomain :              false
     property passExpires :              true
     property goEasy :                   false
     property showChangePass :           false
@@ -485,8 +486,13 @@ Enable it now?" with icon 2 buttons {"No","Yes"} default button 2)
         
         -- If the get an answer from the above dig command
         if "ANSWER SECTION" is in digResult
-            set my onDomain to true
-            log "Domain reachable."
+            if my onDomain is false
+                set my onDomain to true
+                set my freshDomain to true
+                log "Domain reachable."
+            else
+                set my freshDomain to false
+            end if
             my statusMenu's itemWithTitle_("Refresh Kerberos Ticket")'s setEnabled_(1)
             -- Set variable to boolean
             set allowPasswordChange to allowPasswordChange as boolean
@@ -504,12 +510,12 @@ Enable it now?" with icon 2 buttons {"No","Yes"} default button 2)
             my statusMenu's itemWithTitle_("Change Password…")'s setEnabled_(0)
         end if
 
-        -- If we're on the domain
-        if my onDomain is true
+        -- Run this section only if the domain just became reachable.
+        if my onDomain is true and my freshDomain is true
             canPassExpire_(me)
             -- If password can expire
             if passExpires
-                -- if we're using Auto and we don't have the password expiration age,   check for kerberos ticket
+                -- if we're using Auto and we don't have the password expiration age, check for kerberos ticket
                 if my expireDateUnix = 0 and my selectedMethod = 0
                     doKerbCheck_(me)
                     if first_run -- only display prefs window if running for first time
