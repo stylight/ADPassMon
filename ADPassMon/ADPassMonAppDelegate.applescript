@@ -1222,6 +1222,7 @@ Enable it now?" with icon 2 buttons {"No","Yes"} default button 2)
         tell defaults to set my pwPolicyURLButtonTitle to objectForKey_("pwPolicyURLButtonTitle") as string
         tell defaults to set my pwPolicyURLButtonURL to objectForKey_("pwPolicyURLButtonURL") as string
         tell defaults to set my pwPolicyURLButtonBrowser to objectForKey_("pwPolicyURLButtonBrowser") as string
+        tell defaults to set my pwpolicyButton to objectForKey_("pwPolicyButton") as string
         -- If either pwPolicyURLButtonTitle or pwPolicyURLButtonURL is not set, then display standard pwPolicy prompt
         if pwPolicyURLButtonTitle is "" or pwPolicyURLButtonURL is ""
             -- If pwPolicyButton is not set
