@@ -92,7 +92,6 @@ If you do not know your keychain password, enter your new password in the New an
     property launchAtLogin :            false
     property skipKerb :                 false
     property onDomain :                 false
-    property freshDomain :              false
     property passExpires :              true
     property goEasy :                   false
     property showChangePass :           false
@@ -445,7 +444,6 @@ Enable it now?" with icon 2 buttons {"No","Yes"} default button 2)
         end try
         if "ANSWER SECTION" is in digResult
             set my onDomain to true
-            log "Domain reachable."
             my statusMenu's itemWithTitle_("Refresh Kerberos Ticket")'s setEnabled_(1)
             -- Set variable to boolean
             set allowPasswordChange to allowPasswordChange as boolean
@@ -463,88 +461,9 @@ Enable it now?" with icon 2 buttons {"No","Yes"} default button 2)
             my statusMenu's itemWithTitle_("Change Password…")'s setEnabled_(0)
         end if
     end domainTest_
-
-       -- Test to see if we're on the domain
+    
     on intervalDomainTest_(sender)
-
-        -- Grab domain name from bind information
-        set domain to (do shell script "/usr/sbin/dsconfigad -show | /usr/bin/awk '/Active Directory Domain/{print $NF}'") as text
-        
-        -- Test domain connectivity
-        try
-            set digResult to (do shell script "/usr/bin/dig +time=2 +tries=1 -t srv _ldap._tcp." & domain) as text
-        on error theError
-            log "Domain test timed out."
-            set my onDomain to false
-            my statusMenu's itemWithTitle_("Refresh Kerberos Ticket")'s setEnabled_(0)
-            my statusMenu's itemWithTitle_("Change Password…")'s setEnabled_(0)
-            return
-        end try
-        
-        -- For UI update
-        delay 0.1
-        
-        -- If the get an answer from the above dig command
-        if "ANSWER SECTION" is in digResult
-            if my onDomain is false
-                set my onDomain to true
-                set my freshDomain to true
-                log "Domain reachable."
-            else
-                set my freshDomain to false
-            end if
-            my statusMenu's itemWithTitle_("Refresh Kerberos Ticket")'s setEnabled_(1)
-            -- Set variable to boolean
-            set allowPasswordChange to allowPasswordChange as boolean
-            -- If password change is allowed, show
-            if allowPasswordChange is true
-                my statusMenu's itemWithTitle_("Change Password…")'s setEnabled_(1)
-            -- If password change is not allowed, but a password policy is set, show (as this will show policy).
-            else if pwPolicyURLButtonTitle is not equal to "" and pwPolicyURLButtonURL is not equal to ""
-                my statusMenu's itemWithTitle_("Change Password…")'s setEnabled_(1)
-            end if
-        else
-            set my onDomain to false
-            log "Domain not reachable."
-            my statusMenu's itemWithTitle_("Refresh Kerberos Ticket")'s setEnabled_(0)
-            my statusMenu's itemWithTitle_("Change Password…")'s setEnabled_(0)
-        end if
-
-        -- Run this section only if the domain just became reachable.
-        if my onDomain is true and my freshDomain is true
-            canPassExpire_(me)
-            -- If password can expire
-            if passExpires
-                -- if we're using Auto and we don't have the password expiration age, check for kerberos ticket
-                if my expireDateUnix = 0 and my selectedMethod = 0
-                    doKerbCheck_(me)
-                    if first_run -- only display prefs window if running for first time
-                        if prefsLocked as integer is equal to 0 -- only display the window if prefs are not locked
-                            log "First launch, waiting for settings..."
-                            theWindow's makeKeyAndOrderFront_(null)
-                            set my theMessage to "Welcome!\nPlease choose your configuration options."
-                            set first_run to false
-                            tell defaults to setObject_forKey_(first_run, "first_run")
-                        end if
-                    end if
-                else if my selectedMethod is 1
-                    set my manualExpireDays to expireAge
-                    set my isHidden to true
-                    set my isManualEnabled to true
-                    doProcess_(me)
-                else if my selectedMethod is 0
-                    set my isHidden to false
-                    set my isManualEnabled to false
-                    set my manualExpireDays to ""
-                    doProcess_(me)
-                end if
-
-                watchForWake_(me)
-
-            else
-                log "Stopping."
-            end if
-        end if
+        domainTest_(me)
     end intervalDomainTest_
 
     -- Check if password is set to never expire
@@ -1228,20 +1147,12 @@ Enable it now?" with icon 2 buttons {"No","Yes"} default button 2)
         tell defaults to set my pwPolicyURLButtonTitle to objectForKey_("pwPolicyURLButtonTitle") as string
         tell defaults to set my pwPolicyURLButtonURL to objectForKey_("pwPolicyURLButtonURL") as string
         tell defaults to set my pwPolicyURLButtonBrowser to objectForKey_("pwPolicyURLButtonBrowser") as string
-        tell defaults to set my pwpolicyButton to objectForKey_("pwPolicyButton") as string
         -- If either pwPolicyURLButtonTitle or pwPolicyURLButtonURL is not set, then display standard pwPolicy prompt
         if pwPolicyURLButtonTitle is "" or pwPolicyURLButtonURL is ""
-            -- If pwPolicyButton is not set
-            if pwPolicyButton is ""
-                -- Display password policy dialog
-                tell application "System Events" to display dialog pwPolicy with icon 2 buttons {"OK"}
-            -- if pwPolicyButton is set
-            else
-                -- Display password policy dialog with custom button
-                tell application "System Events" to display dialog pwPolicy with icon 2 buttons {pwPolicyButton}
-            end if
-        -- If both pwPolicyURLButtonTitle or pwPolicyURLButtonURL are set, then display second button
-        else if pwPolicyURLButtonTitle is not equal to "" and pwPolicyURLButtonURL is not equal to ""
+            -- Display password policy dialog
+            tell application "System Events" to display dialog pwPolicy with icon 2 buttons {"OK"}
+            -- If both pwPolicyURLButtonTitle or pwPolicyURLButtonURL are set, then display second button
+            else if pwPolicyURLButtonTitle is not equal to "" and pwPolicyURLButtonURL is not equal to ""
             -- Display password policy dialog
             tell application "System Events" to display dialog pwPolicy with icon 2 buttons {"OK", pwPolicyURLButtonTitle}
             -- If pwPolicyURLButtonTitle...
@@ -1261,7 +1172,7 @@ Enable it now?" with icon 2 buttons {"No","Yes"} default button 2)
                     -- If users chose the URL, then we don't want to proceed
                     set pwPolicyUpdateExternal to true
                 end if
-            else
+                else
                 -- Set variable to boolean
                 set allowPasswordChange to allowPasswordChange as boolean
                 -- If password change is  not allowed, then proceed
@@ -1485,6 +1396,7 @@ Please choose your configuration options."
         menuItem's setTarget_(me)
         menuItem's setAction_("about:")
         menuItem's setEnabled_(true)
+        menuItem's setHidden_(true)
         statusMenu's addItem_(menuItem)
         menuItem's release()
 
@@ -1495,6 +1407,7 @@ Please choose your configuration options."
         menuItem's setEnabled_(true)
         menuItem's setState_(enableNotifications as integer)
         statusMenu's addItem_(menuItem)
+        menuItem's setHidden_(true)
         menuItem's release()
         
         set menuItem to (my NSMenuItem's alloc)'s init
@@ -1522,6 +1435,7 @@ Please choose your configuration options."
         menuItem's setTarget_(me)
         menuItem's setAction_("doKerbCheck:")
         menuItem's setEnabled_(onDomain as boolean)
+        menuItem's setHidden_(true)
         statusMenu's addItem_(menuItem)
         menuItem's release()
         
@@ -1530,6 +1444,7 @@ Please choose your configuration options."
         menuItem's setTarget_(me)
         menuItem's setAction_("ticketViewer:")
         menuItem's setEnabled_(true)
+        menuItem's setHidden_(true)
         statusMenu's addItem_(menuItem)
         menuItem's release()
         
@@ -1571,14 +1486,47 @@ Please choose your configuration options."
         notifySetup_(me)
         doSelectedBehaviourCheck_(me) -- Check for Selected Behaviour
         createMenu_(me)  -- build and display the status menu item
-        intervaldomainTest_(me)  -- test domain connectivity
-
-        -- Set a timer to check for domain connectivity every five minutes. (300)
-        set my domainTimer to NSTimer's scheduledTimerWithTimeInterval_target_selector_userInfo_repeats_(300, me, "intervalDomainTest:", missing value, true)
-
-        -- Set a timer to trigger doProcess handler on an interval and spawn notifications (if enabled).
-        set my processTimer to NSTimer's scheduledTimerWithTimeInterval_target_selector_userInfo_repeats_((my passwordCheckInterval * 3600), me, "intervalDoProcess:", missing value, true)
-
+        domainTest_(me)  -- test domain connectivity
+        if my onDomain is true
+            canPassExpire_(me)
+            if passExpires
+                -- if we're using Auto and we don't have the password expiration age, check for kerberos ticket
+                if my expireDateUnix = 0 and my selectedMethod = 0
+                    doKerbCheck_(me)
+                    if first_run -- only display prefs window if running for first time
+                        if prefsLocked as integer is equal to 0 -- only display the window if prefs are not locked
+                            log "First launch, waiting for settings..."
+                            theWindow's makeKeyAndOrderFront_(null)
+                            set my theMessage to "Welcome!\nPlease choose your configuration options."
+                            set first_run to false
+                            tell defaults to setObject_forKey_(first_run, "first_run")
+                        end if
+                    end if
+                else if my selectedMethod is 1
+                    set my manualExpireDays to expireAge
+                    set my isHidden to true
+                    set my isManualEnabled to true
+                    doProcess_(me)
+                else if my selectedMethod is 0
+                    set my isHidden to false
+                    set my isManualEnabled to false
+                    set my manualExpireDays to ""
+                    doProcess_(me)
+                end if
+                
+                watchForWake_(me)
+                
+                -- Set a timer to check for domain connectivity every five minutes. (300)
+                set my domainTimer to NSTimer's scheduledTimerWithTimeInterval_target_selector_userInfo_repeats_(300, me, "intervalDomainTest:", missing value, true)
+                
+                -- Set a timer to trigger doProcess handler on an interval and spawn notifications (if enabled).
+                set my processTimer to NSTimer's scheduledTimerWithTimeInterval_target_selector_userInfo_repeats_((my passwordCheckInterval * 3600), me, "intervalDoProcess:", missing value, true)
+                else
+                log "Stopping."
+            end if
+        else
+            --offlineUpdate_(me)
+        end if
     end startMeUp_
 
     -- Do processes necessary for app initiation, but check if account is local first

@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		03B8269E1BF87415006D1A74 /* ADPassMon-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 03B8269C1BF87415006D1A74 /* ADPassMon-Info.plist */; };
 		39094F241338DBE4007821C2 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 39094F231338DBE4007821C2 /* Cocoa.framework */; };
 		39094F261338DBE4007821C2 /* AppleScriptObjC.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 39094F251338DBE4007821C2 /* AppleScriptObjC.framework */; };
 		39094F301338DBE4007821C2 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 39094F2E1338DBE4007821C2 /* InfoPlist.strings */; };
@@ -34,13 +35,13 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		03B8269D1BF87415006D1A74 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = en; path = "en.lproj/ADPassMon-Info.plist"; sourceTree = "<group>"; };
 		39094F1F1338DBE4007821C2 /* ADPassMon.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ADPassMon.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		39094F231338DBE4007821C2 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		39094F251338DBE4007821C2 /* AppleScriptObjC.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppleScriptObjC.framework; path = System/Library/Frameworks/AppleScriptObjC.framework; sourceTree = SDKROOT; };
 		39094F281338DBE4007821C2 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
 		39094F291338DBE4007821C2 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
 		39094F2A1338DBE4007821C2 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
-		39094F2D1338DBE4007821C2 /* ADPassMon-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "ADPassMon-Info.plist"; sourceTree = "<group>"; };
 		39094F2F1338DBE4007821C2 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		39094F311338DBE4007821C2 /* ADPassMon-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "ADPassMon-Prefix.pch"; sourceTree = "<group>"; };
 		39094F321338DBE4007821C2 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
@@ -122,9 +123,9 @@
 			isa = PBXGroup;
 			children = (
 				7C36C8471B9837C100D56827 /* AppIcon.icns */,
-				39094F2D1338DBE4007821C2 /* ADPassMon-Info.plist */,
 				39094F2E1338DBE4007821C2 /* InfoPlist.strings */,
 				39094F311338DBE4007821C2 /* ADPassMon-Prefix.pch */,
+				03B8269C1BF87415006D1A74 /* ADPassMon-Info.plist */,
 				39094F321338DBE4007821C2 /* main.m */,
 				39094F341338DBE4007821C2 /* Credits.rtf */,
 			);
@@ -154,7 +155,6 @@
 				39094F1C1338DBE4007821C2 /* Frameworks */,
 				39094F1D1338DBE4007821C2 /* Resources */,
 				39925BA9133D064F001C9566 /* CopyFiles */,
-				7CC7A3981C03D1FE00853A3A /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -198,6 +198,7 @@
 				39094F301338DBE4007821C2 /* InfoPlist.strings in Resources */,
 				39094F361338DBE4007821C2 /* Credits.rtf in Resources */,
 				7C36C8481B9837C100D56827 /* AppIcon.icns in Resources */,
+				03B8269E1BF87415006D1A74 /* ADPassMon-Info.plist in Resources */,
 				39DC46FB1B6A6DF000AABB81 /* Images.xcassets in Resources */,
 				391FC4F21361276900D2E33C /* README.md in Resources */,
 				39D5363D1BB0744400D64989 /* MainMenu.xib in Resources */,
@@ -205,22 +206,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
-
-/* Begin PBXShellScriptBuildPhase section */
-		7CC7A3981C03D1FE00853A3A /* ShellScript */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "#\n# Sets the version string to a monotonically increased string, based on\n# the number of git commits.\n\nset -o errexit\nset -o nounset\n\nVERSION=$(git --git-dir=\"$PROJECT_DIR/.git\" --work-tree=\"$PROJECT_DIR\" log | grep '^commit' | wc -l)\n/usr/libexec/PlistBuddy -c \"Set :CFBundleVersion $VERSION\" \"$TARGET_BUILD_DIR/$INFOPLIST_PATH\"";
-		};
-/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		39094F1B1338DBE4007821C2 /* Sources */ = {
@@ -237,6 +222,14 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXVariantGroup section */
+		03B8269C1BF87415006D1A74 /* ADPassMon-Info.plist */ = {
+			isa = PBXVariantGroup;
+			children = (
+				03B8269D1BF87415006D1A74 /* en */,
+			);
+			name = "ADPassMon-Info.plist";
+			sourceTree = "<group>";
+		};
 		39094F2E1338DBE4007821C2 /* InfoPlist.strings */ = {
 			isa = PBXVariantGroup;
 			children = (
@@ -329,8 +322,10 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "";
 				COMBINE_HIDPI_IMAGES = YES;
-				COPY_PHASE_STRIP = NO;
+				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -345,6 +340,7 @@
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = "org.pmbuko.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -354,6 +350,8 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "";
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
@@ -369,6 +367,7 @@
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = "org.pmbuko.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;
